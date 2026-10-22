@@ -1,0 +1,10 @@
+[
+  { "username": "harry", "displayName": "Harry", "password": "change-me", "isAdmin": true },
+  { "username": "kier", "displayName": "Kier", "password": "change-me" },
+  { "username": "ollie", "displayName": "Ollie", "password": "change-me" },
+  { "username": "reiss", "displayName": "Reiss", "password": "change-me" },
+  { "username": "joe", "displayName": "Joe", "password": "change-me" },
+  { "username": "sean", "displayName": "Sean", "password": "change-me" },
+  { "username": "connor", "displayName": "Connor", "password": "change-me" },
+  { "username": "hutton", "displayName": "Hutton", "password": "change-me" }
+]

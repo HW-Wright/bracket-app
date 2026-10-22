@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#0b0a09"/>
+  <!-- stepped deco frame -->
+  <path d="M8 14h6V8h36v6h6v36h-6v6H14v-6H8z" fill="none" stroke="#c9a54c" stroke-width="2"/>
+  <path d="M12 17h5v-5h30v5h5v30h-5v5H17v-5h-5z" fill="none" stroke="#8a6f2e" stroke-width="1"/>
+  <!-- sunburst rays -->
+  <g stroke="#8a6f2e" stroke-width="1">
+    <path d="M32 50 20 18M32 50 32 16M32 50 44 18"/>
+  </g>
+  <text x="32" y="44" text-anchor="middle" font-family="Didot, Georgia, serif" font-size="26" fill="#e2c98a">G</text>
+</svg>

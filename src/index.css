@@ -1,0 +1,44 @@
+@import 'tailwindcss';
+
+/* Design tokens. Gold is an accent only: rules, borders, headings, selected states. */
+@theme {
+  --color-ink-950: #0b0a09;
+  --color-ink-900: #14120f;
+  --color-ink-800: #1d1a16;
+  --color-ink-700: #2a261f;
+  --color-line: #3a342a;
+
+  --color-gold-300: #e2c98a;
+  --color-gold-500: #c9a54c;
+  --color-gold-700: #8a6f2e;
+
+  --color-ivory: #f1e9d8;
+  --color-ivory-muted: #b9ae97;
+
+  --color-danger: #e07a6a;
+  --color-ok: #9cc58a;
+
+  --font-display: 'Limelight', 'Didot', serif;
+  --font-sans: 'Jost', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-ink-950 text-ivory font-sans antialiased;
+    min-height: 100dvh;
+  }
+}
+
+@utility label-caps {
+  @apply text-xs font-medium uppercase tracking-[0.2em] text-ivory-muted;
+}
+
+/* Fine double gold rule. */
+@utility rule-double {
+  height: 5px;
+  border-top: 1px solid var(--color-gold-700);
+  border-bottom: 1px solid var(--color-gold-700);
+}
