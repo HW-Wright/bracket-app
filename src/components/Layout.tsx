@@ -1,9 +1,11 @@
-import type React from 'react'
+import { useEffect } from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
+import { useLatestResults } from '../bracket/useLatestResults'
 import { useKeyboardAware } from '../lib/useKeyboardAware'
+import Crawl from './Crawl'
 
 const icons: Record<string, string> = {
   home: 'M4 11 12 4l8 7v9h-5v-6H9v6H4z',
@@ -55,45 +57,41 @@ function Ticker() {
         complete: ['FINAL', bracket.title],
       }[bracket.phase].filter(Boolean)
 
-  // Repeat short feeds so one copy is always wider than the screen, then run two copies end to end so
-  // the crawl loops seamlessly (the track moves left by exactly one copy). Speed is constant per character.
-  const chars = items.join(' ● ').length + 3
-  const reps = Math.max(1, Math.ceil(70 / chars))
-  const feed = Array.from({ length: reps }, () => items).flat()
-  const seconds = Math.round(chars * reps * 0.2)
-
-  const copy = (hidden: boolean) => (
-    <span aria-hidden={hidden || undefined} className="flex shrink-0 items-center">
-      {feed.map((item, i) => (
-        <span key={i} className="flex items-center">
-          {item}
-          <span className="px-2.5 text-line" aria-hidden>
-            ●
-          </span>
-        </span>
-      ))}
-    </span>
-  )
-
   return (
-    <div
-      role="marquee"
-      aria-label={items.join('. ')}
-      className="led flex h-[26px] items-center overflow-hidden font-led text-[13px] whitespace-nowrap text-amber uppercase"
-    >
-      {live && (
-        // Pinned "LIVE" bug, like a broadcast; the feed crawls underneath it.
-        <span className="relative z-[1] flex h-full shrink-0 items-center gap-1.5 border-r border-line bg-led pr-2.5 pl-3 text-danger">
-          <span className="h-2 w-2 rounded-full bg-live motion-safe:animate-pulse" aria-hidden />
-          LIVE
-        </span>
-      )}
-      <div className="min-w-0 flex-1 overflow-hidden">
-        <div className="ticker-track flex w-max" style={{ '--ticker-duration': `${seconds}s` } as React.CSSProperties}>
-          {copy(false)}
-          {copy(true)}
-        </div>
-      </div>
+    <Crawl
+      label="News"
+      items={items}
+      pinned={
+        live && (
+          <span className="flex items-center gap-1.5 text-danger">
+            <span className="h-2 w-2 rounded-full bg-live motion-safe:animate-pulse" aria-hidden />
+            LIVE
+          </span>
+        )
+      }
+    />
+  )
+}
+
+/** Under the tab bar: every result from the most recently closed round. Hidden until a round has closed. */
+function ResultsCrawl() {
+  const { bracket } = useBracket()
+  const results = useLatestResults(bracket?.id, bracket?.phase === 'live' || bracket?.phase === 'complete')
+
+  // Bars pinned above the tab bar (save / merge / lock) read this to clear the extra strip.
+  useEffect(() => {
+    document.documentElement.style.setProperty('--results-h', results ? '26px' : '0px')
+  }, [results])
+
+  if (!results) return null
+  const round = ['R64', 'R32', 'R16', 'QF', 'SF', 'FINAL'][results.stage.round - 1]
+  return (
+    <div className="border-t border-line">
+      <Crawl
+        label={`${results.stage.label} results`}
+        items={results.lines}
+        pinned={<span className="slant bg-yellow px-2 font-display text-[11px] text-navy-950">{round} RESULTS</span>}
+      />
     </div>
   )
 }
@@ -120,7 +118,7 @@ export default function Layout() {
           </Link>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-6 pb-28">
+      <main className="mx-auto w-full max-w-xl flex-1 px-4 pt-6 pb-[calc(6rem+var(--results-h,0px)+env(safe-area-inset-bottom))]">
         <Outlet />
       </main>
       <nav
@@ -135,6 +133,7 @@ export default function Layout() {
           <Tab to="/stats" label="Stats" icon="stats" />
           {profile?.is_admin && <Tab to="/admin" label="Admin" icon="admin" />}
         </div>
+        <ResultsCrawl />
       </nav>
     </div>
   )

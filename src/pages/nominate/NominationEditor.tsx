@@ -254,7 +254,7 @@ export default function NominationEditor({
 
       <ErrorText>{error}</ErrorText>
 
-      <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-navy-950/95 py-3 backdrop-blur">
+      <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+var(--results-h,0px)+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-navy-950/95 py-3 backdrop-blur">
         <Button onClick={save} disabled={!dirty || status === 'saving'} className="flex-1">
           {status === 'saving'
             ? 'Saving…'

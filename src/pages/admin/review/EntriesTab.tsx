@@ -229,7 +229,7 @@ export default function EntriesTab({
       </ol>
 
       {pick.length > 0 && (
-        <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-navy-950/95 py-3 backdrop-blur">
+        <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+var(--results-h,0px)+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-navy-950/95 py-3 backdrop-blur">
           <span className="min-w-0 flex-1 truncate text-base">
             <Badge tone="yellow" className="mr-2">
               {pick.length}/2

@@ -80,7 +80,7 @@ function SeedingTab({ data, locked, onLock, busy }: { data: ReviewData; locked: 
       )}
 
       {!locked && (
-        <div className="sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] border-t border-line bg-navy-950/95 py-3 backdrop-blur">
+        <div className="sticky bottom-[calc(3.5rem+var(--results-h,0px)+env(safe-area-inset-bottom))] border-t border-line bg-navy-950/95 py-3 backdrop-blur">
           <Button onClick={onLock} disabled={shortfall > 0 || busy} className="w-full">
             {shortfall > 0 ? `Need ${shortfall} more to lock` : 'Lock seeding and tip off'}
           </Button>
