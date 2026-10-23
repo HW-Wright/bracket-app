@@ -230,7 +230,8 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### Motifs
 - Slanted (skewX) caption bars and badges for eyebrows and section labels; slanted pick bars with a yellow offset shadow on the selected one.
-- LED ticker strip at the top: LIVE dot plus the current phase and progress.
+- LED ticker strip at the top: a pinned LIVE badge with the current phase and progress crawling across like a sports-channel news ticker.
+- Results crawl under the bottom tab bar: every result from the most recently closed round, scrolling the same way (hidden until a round has closed).
 - **Every matchup sits in its own "GAME n" box** (bordered panel with an LED header strip: game number left, VOTES / TIED / result right), so it's always clear which two entries face each other. Inside: two pick bars with a tally bar and VS (or TIED) badge between them.
 - Coin-toss and admin-decision badges in the same slanted-badge style.
 
