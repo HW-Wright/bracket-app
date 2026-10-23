@@ -62,3 +62,15 @@ html[data-keyboard] .hide-with-keyboard {
 html[data-keyboard] .unstick-with-keyboard {
   position: static;
 }
+
+/* Champion title card entrance (only under motion-safe). */
+@keyframes champ {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -53,6 +53,12 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - `npm run test-bracket -- create|delete [--local]`: throwaway "Test – ignore" bracket in review with 64 dummy entries (refuses if a real bracket is active).
 - FKs into `entries` cascade/set null so deleting a bracket removes everything.
 
+## History, stats, archive (Phase 6)
+- `useBracketData(bracketId)` loads one bracket (active or archived): stages, matchups, tallies, visible votes, names; tallies live.
+- Pure derivations in `src/lib/stats.ts` (upsets, voteTotals, entryPath, podium, pickStatus) with Vitest coverage.
+- Screens: `/bracket` (round tabs + tree, champion card when complete), `/entry/:id`, `/stats`, `/archive`, `/archive/:id`. `MatchupCard` is shared (vote mode via `onPick`, read-only via `link`).
+- `npm run test:queries`: PostgREST query smoke test (local).
+
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
 - RLS on every table. Privacy rules (blind nominations, hidden voters) are enforced in the DB, not just the UI.
@@ -62,4 +68,4 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Design: direction D "Broadcast Scoreboard" (SPEC §13): navy + court orange broadcast graphics, slanted `Badge`s, amber LED numbers via `Led` (`font-led`). Tokens in `src/index.css`; shared pieces in `src/components/ui.tsx`. Every matchup goes in a "GAME n" box. No NCAA trademarks.
 
 ## Status
-Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 (voting & advancement) built; next Phase 6 (history, entry pages, stats, champion, archive).
+Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 done (6 stages, one per round). Phase 6 built; next Phase 7 (design polish) and 8 (dry run).

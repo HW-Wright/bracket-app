@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { Link } from 'react-router'
 import type { EntryRef, Matchup, Tally } from '../bracket/useStage'
 import EntryThumb from './EntryThumb'
 import { Badge } from './ui'
@@ -9,6 +11,7 @@ function PickBar({
   won,
   lost,
   onPick,
+  link,
 }: {
   entry: EntryRef | null
   votes: number
@@ -16,6 +19,7 @@ function PickBar({
   won: boolean
   lost: boolean
   onPick?: () => void
+  link?: boolean
 }) {
   const highlight = picked || won
   const body = (
@@ -41,13 +45,21 @@ function PickBar({
       ? 'bg-orange text-navy-950 shadow-[4px_4px_0_var(--color-yellow)]'
       : `border border-line bg-navy-800 ${lost ? 'opacity-60' : ''}`
   }`
-  return onPick && entry ? (
-    <button type="button" aria-pressed={picked} aria-label={`${entry.name}, seed ${entry.seed}, ${votes} votes`} onClick={onPick} className={cls}>
-      {body}
-    </button>
-  ) : (
-    <div className={cls}>{body}</div>
-  )
+  if (onPick && entry) {
+    return (
+      <button type="button" aria-pressed={picked} aria-label={`${entry.name}, seed ${entry.seed}, ${votes} votes`} onClick={onPick} className={cls}>
+        {body}
+      </button>
+    )
+  }
+  if (link && entry) {
+    return (
+      <Link to={`/entry/${entry.id}`} aria-label={`${entry.name}, seed ${entry.seed}, ${votes} votes`} className={cls}>
+        {body}
+      </Link>
+    )
+  }
+  return <div className={cls}>{body}</div>
 }
 
 /** One matchup in a "GAME n" box: two pick bars, a live tally bar and a VS / TIED badge. */
@@ -57,12 +69,18 @@ export default function MatchupCard({
   tally,
   myVote,
   onPick,
+  link,
+  footer,
 }: {
   number: number
   matchup: Matchup
   tally: Tally | undefined
   myVote?: string
   onPick?: (entryId: string) => void
+  /** Read-only cards: entries link to their entry pages. */
+  link?: boolean
+  /** Extra content under the bars (e.g. who voted for what). */
+  footer?: ReactNode
 }) {
   const a = tally?.votes_a ?? 0
   const b = tally?.votes_b ?? 0
@@ -96,6 +114,7 @@ export default function MatchupCard({
           won={decided && matchup.winner === matchup.a?.id}
           lost={decided && matchup.winner !== matchup.a?.id}
           onPick={onPick && matchup.a ? () => onPick(matchup.a!.id) : undefined}
+          link={link}
         />
         <div className="flex items-center gap-2.5 px-3" aria-hidden>
           <span className="flex h-1.5 flex-1 justify-start bg-line">
@@ -113,7 +132,9 @@ export default function MatchupCard({
           won={decided && matchup.winner === matchup.b?.id}
           lost={decided && matchup.winner !== matchup.b?.id}
           onPick={onPick && matchup.b ? () => onPick(matchup.b!.id) : undefined}
+          link={link}
         />
+        {footer}
       </div>
     </article>
   )

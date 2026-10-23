@@ -6,13 +6,17 @@ import Layout from './components/Layout'
 import ForcePasswordChange from './pages/ForcePasswordChange'
 import Home from './pages/Home'
 import Login from './pages/Login'
-import Placeholder from './pages/Placeholder'
 import Profile from './pages/Profile'
 
 const Admin = lazy(() => import('./pages/admin/Admin'))
 const Nominate = lazy(() => import('./pages/nominate/Nominate'))
 const AdminReview = lazy(() => import('./pages/admin/review/AdminReview'))
 const Vote = lazy(() => import('./pages/Vote'))
+const Bracket = lazy(() => import('./pages/bracket/Bracket'))
+const EntryPage = lazy(() => import('./pages/EntryPage'))
+const Stats = lazy(() => import('./pages/Stats'))
+const Archive = lazy(() => import('./pages/archive/Archive'))
+const ArchivedBracket = lazy(() => import('./pages/archive/ArchivedBracket'))
 
 function Splash() {
   return <div className="min-h-dvh" aria-busy="true" />
@@ -33,9 +37,11 @@ function Gate() {
             <Route index element={<Home />} />
             <Route path="nominate" element={<Nominate />} />
             <Route path="vote" element={<Vote />} />
-            <Route path="bracket" element={<Placeholder title="Bracket" note="The bracket appears once seeding is locked." />} />
-            <Route path="stats" element={<Placeholder title="Stats" note="Upsets and running vote totals appear once voting starts." />} />
-            <Route path="archive" element={<Placeholder title="Archive" note="No past brackets yet." />} />
+            <Route path="bracket" element={<Bracket />} />
+            <Route path="entry/:id" element={<EntryPage />} />
+            <Route path="stats" element={<Stats />} />
+            <Route path="archive" element={<Archive />} />
+            <Route path="archive/:id" element={<ArchivedBracket />} />
             <Route path="profile" element={<Profile />} />
             <Route path="admin" element={<Admin />} />
             <Route path="admin/review" element={<AdminReview />} />

@@ -7,7 +7,7 @@ import { listStatus, MAX_NOMINATIONS } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
 import NominationEditor from './NominationEditor'
 
-interface NominationRow {
+export interface NominationRow {
   user_id: string
   rank: number
   text: string
@@ -22,7 +22,7 @@ export function ProgressLine({ submitted, total }: { submitted: number; total: n
   )
 }
 
-function AllNominations({ rows }: { rows: NominationRow[] }) {
+export function AllNominations({ rows }: { rows: NominationRow[] }) {
   const byUser = new Map<string, { name: string; items: NominationRow[] }>()
   for (const r of rows) {
     const group = byUser.get(r.user_id) ?? { name: r.profiles?.display_name ?? 'Unknown', items: [] }

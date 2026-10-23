@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { useBracket, type Bracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
 import { useOpenStage } from '../bracket/useStage'
+import PicksAlive from '../components/PicksAlive'
 import { Card, Led, PageTitle } from '../components/ui'
 import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
 import { supabase } from '../lib/supabase'
@@ -126,6 +127,11 @@ export default function Home() {
       )}
       {bracket.phase === 'live' && <VotingLive bracket={bracket} />}
       {bracket.phase === 'complete' && <Action to="/bracket">See the champion</Action>}
+      {(bracket.phase === 'live' || bracket.phase === 'complete') && (
+        <div className="mt-6">
+          <PicksAlive bracketId={bracket.id} />
+        </div>
+      )}
       {profile?.is_admin && (
         <Link to="/admin" className="mt-8 block text-center text-base font-bold text-orange uppercase underline-offset-4 hover:underline">
           Admin controls →
