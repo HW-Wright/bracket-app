@@ -6,6 +6,15 @@ import { Badge, Card, PageTitle } from '../components/ui'
 import { ROUNDS } from '../lib/bracket'
 import { isThirdPlace, upsets, voteTotals } from '../lib/stats'
 
+/** Broadcast segment banner: a slanted yellow caption bar with an orange offset shadow. */
+function SeanZone() {
+  return (
+    <div className="-mt-2 mb-6 ml-1.5 w-fit -skew-x-12 border-l-[6px] border-orange bg-yellow px-4 py-1.5 shadow-[4px_4px_0_var(--color-orange)]">
+      <p className="font-display text-xl text-navy-950 uppercase italic">The Sean Zone</p>
+    </div>
+  )
+}
+
 export default function Stats() {
   const { bracket } = useBracket()
   const { data, loading } = useBracketData(bracket?.id)
@@ -16,6 +25,7 @@ export default function Stats() {
     return (
       <>
         <PageTitle>Stats</PageTitle>
+        <SeanZone />
         <Card>
           <p className="text-base text-muted">Upsets and running vote totals appear once voting starts.</p>
         </Card>
@@ -31,6 +41,7 @@ export default function Stats() {
   return (
     <>
       <PageTitle eyebrow={data.openStage ? `After stage ${closed} of ${data.stages.length} · live` : `After stage ${closed} of ${data.stages.length}`}>Stats</PageTitle>
+      <SeanZone />
       <div className="flex flex-col gap-6">
         <Card title="Upsets · biggest first" aside={<Badge tone="live">{ups.length}</Badge>}>
           {ups.length === 0 ? (
