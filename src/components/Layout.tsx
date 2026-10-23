@@ -1,3 +1,4 @@
+import type React from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracket } from '../bracket/BracketProvider'
@@ -54,24 +55,45 @@ function Ticker() {
         complete: ['FINAL', bracket.title],
       }[bracket.phase].filter(Boolean)
 
+  // Repeat short feeds so one copy is always wider than the screen, then run two copies end to end so
+  // the crawl loops seamlessly (the track moves left by exactly one copy). Speed is constant per character.
+  const chars = items.join(' ● ').length + 3
+  const reps = Math.max(1, Math.ceil(70 / chars))
+  const feed = Array.from({ length: reps }, () => items).flat()
+  const seconds = Math.round(chars * reps * 0.2)
+
+  const copy = (hidden: boolean) => (
+    <span aria-hidden={hidden || undefined} className="flex shrink-0 items-center">
+      {feed.map((item, i) => (
+        <span key={i} className="flex items-center">
+          {item}
+          <span className="px-2.5 text-line" aria-hidden>
+            ●
+          </span>
+        </span>
+      ))}
+    </span>
+  )
+
   return (
-    <div className="led flex h-[26px] items-center gap-2.5 overflow-hidden px-3 font-led text-[13px] whitespace-nowrap text-amber uppercase">
+    <div
+      role="marquee"
+      aria-label={items.join('. ')}
+      className="led flex h-[26px] items-center overflow-hidden font-led text-[13px] whitespace-nowrap text-amber uppercase"
+    >
       {live && (
-        <span className="flex items-center gap-1.5 text-danger">
-          <span className="h-2 w-2 rounded-full bg-live" aria-hidden />
+        // Pinned "LIVE" bug, like a broadcast; the feed crawls underneath it.
+        <span className="relative z-[1] flex h-full shrink-0 items-center gap-1.5 border-r border-line bg-led pr-2.5 pl-3 text-danger">
+          <span className="h-2 w-2 rounded-full bg-live motion-safe:animate-pulse" aria-hidden />
           LIVE
         </span>
       )}
-      {items.map((item, i) => (
-        <span key={i} className="flex items-center gap-2.5">
-          {i > 0 && (
-            <span className="text-line" aria-hidden>
-              ●
-            </span>
-          )}
-          {item}
-        </span>
-      ))}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <div className="ticker-track flex w-max" style={{ '--ticker-duration': `${seconds}s` } as React.CSSProperties}>
+          {copy(false)}
+          {copy(true)}
+        </div>
+      </div>
     </div>
   )
 }
