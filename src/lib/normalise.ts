@@ -15,11 +15,19 @@ export function normaliseEntry(raw: string): string {
     .replace(/^(the|a|an) /, '')
 }
 
-/** Groups of indexes (2+) whose entries normalise to the same text. */
+/**
+ * Matching key: the normalised form with spaces removed, so "Spider-Man", "Spider Man" and "spiderman"
+ * collide. Use for equality; use normaliseEntry() for fuzzy similarity.
+ */
+export function entryKey(raw: string): string {
+  return normaliseEntry(raw).replace(/ /g, '')
+}
+
+/** Groups of indexes (2+) whose entries share an entryKey(). */
 export function findOwnDuplicates(items: string[]): number[][] {
   const groups = new Map<string, number[]>()
   items.forEach((item, i) => {
-    const key = normaliseEntry(item)
+    const key = entryKey(item)
     if (!key) return
     groups.set(key, [...(groups.get(key) ?? []), i])
   })

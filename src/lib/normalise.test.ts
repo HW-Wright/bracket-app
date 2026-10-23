@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findOwnDuplicates, moveItem, normaliseEntry } from './normalise'
+import { entryKey, findOwnDuplicates, moveItem, normaliseEntry } from './normalise'
 
 describe('normaliseEntry', () => {
   it.each([
@@ -23,7 +23,21 @@ describe('normaliseEntry', () => {
   })
 })
 
+describe('entryKey', () => {
+  it('treats case, hyphens and spacing as the same', () => {
+    const keys = ['spiderman', 'Spiderman', 'Spider-Man', 'Spider Man', ' SPIDER-man! ', 'The Spider-Man'].map(entryKey)
+    expect(new Set(keys)).toEqual(new Set(['spiderman']))
+  })
+  it('keeps genuinely different entries apart', () => {
+    expect(entryKey('Spider-Man 2')).not.toBe(entryKey('Spider-Man'))
+  })
+})
+
 describe('findOwnDuplicates', () => {
+  it('catches Spider-Man spelled three ways', () => {
+    expect(findOwnDuplicates(['spiderman', 'Heat', 'Spider-Man', 'Spiderman'])).toEqual([[0, 2, 3]])
+  })
+
   it('groups entries that normalise the same', () => {
     expect(findOwnDuplicates(['Heat', 'The Thing', 'heat!', 'Alien', 'thing'])).toEqual([
       [0, 2],

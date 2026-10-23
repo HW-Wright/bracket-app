@@ -29,7 +29,9 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - One active bracket (`archived_at is null`, enforced by a unique index). Phases: draft -> nominations -> review -> live -> complete.
 - Phase moves via admin RPCs (`create_bracket`, `set_bracket_phase`, ...); `require_admin()` guards them.
 - Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always, everyone's once phase is past `nominations`. Blind applies to the admin too.
-- `normaliseEntry()` in `src/lib/normalise.ts` is the canonical comparison form (Phase 4 adds a SQL twin).
+- `normaliseEntry()` / `entryKey()` in `src/lib/normalise.ts`: comparison forms (key = normalised with spaces removed). Phase 4 needs a SQL twin.
+- Harry's decision: exact `entryKey` matches auto-combine at close (splittable); fuzzy matches are suggestions only. See SPEC §5.2.
+- `abandon_bracket()` deletes a pre-live bracket: every table referencing `brackets` must `on delete cascade`.
 
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.

@@ -81,7 +81,8 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### 5.2 Duplicate detection
 - Flag likely duplicate groups using normalisation (case, punctuation, diacritics, whitespace, hyphens, leading "the"/"a") plus fuzzy similarity (e.g. Postgres `pg_trgm` or Levenshtein).
-- **Never auto-merge.** Suggestions only. Harry confirms each merge and chooses or types the canonical display name.
+- **Exact matches auto-combine** (decided by Harry, 2026-10-23): nominations whose normalised text is identical once spaces are also removed (e.g. "spiderman", "Spiderman", "Spider-Man") become one entry automatically when nominations close. The entry is labelled with how many spellings it combines, shows every original spelling, and Harry can split it back apart.
+- **Near matches are suggestions only** (typos, fuzzy similarity). Harry confirms each merge and chooses or types the canonical display name.
 - Merges can be undone at any time before seeding is locked.
 - **Merge rule:** if the same user nominated two items that are merged, that user contributes only their best (lowest) rank to the merged entry. No double counting.
 
@@ -251,3 +252,5 @@ Write a `README.md` with:
 - A third-place playoff decides the podium's third place.
 - After nominations close, everyone sees all nominations grouped by user with ranks.
 - Seeding tiebreak order is points, then distinct nominators, then the stored random value.
+- Exact normalised matches auto-combine at close (splittable); fuzzy matches need Harry's confirmation.
+- Harry can abandon (delete) any bracket that has not gone live, with a typed confirmation.

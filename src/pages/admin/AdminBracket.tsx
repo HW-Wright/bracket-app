@@ -58,6 +58,18 @@ export default function AdminBracket() {
     await refresh()
   }
 
+  async function abandon() {
+    const typed = prompt(
+      `This permanently deletes “${bracket!.title}” and everyone's nominations for it.\n\nType the bracket title to confirm:`,
+    )
+    if (typed === null) return
+    setBusy(true)
+    const { error } = await supabase.rpc('abandon_bracket', { p_bracket_id: bracket!.id, p_confirm_title: typed })
+    setBusy(false)
+    setError(rpcMessage(error))
+    await refresh()
+  }
+
   const setPhase = (to: BracketPhase, text: string) =>
     run(() => supabase.rpc('set_bracket_phase', { p_bracket_id: bracket!.id, p_to: to }), text)
 
@@ -151,6 +163,12 @@ export default function AdminBracket() {
               Reopen nominations
             </Button>
           </>
+        )}
+
+        {(bracket.phase === 'nominations' || bracket.phase === 'review') && (
+          <Button variant="danger" disabled={busy} onClick={abandon} className="mt-4">
+            Abandon bracket…
+          </Button>
         )}
 
         <ErrorText>{error}</ErrorText>
