@@ -1,39 +1,50 @@
-import { useEffect, useState } from 'react'
-import { HashRouter, Route, Routes } from 'react-router'
-import { supabase } from './lib/supabase'
+import { lazy, Suspense } from 'react'
+import { HashRouter, Navigate, Route, Routes } from 'react-router'
+import { AuthProvider, useAuth } from './auth/AuthProvider'
+import Layout from './components/Layout'
+import ForcePasswordChange from './pages/ForcePasswordChange'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import Placeholder from './pages/Placeholder'
+import Profile from './pages/Profile'
 
-type PingState = { status: 'loading' } | { status: 'ok'; at: string } | { status: 'error'; message: string }
+const Admin = lazy(() => import('./pages/admin/Admin'))
 
-function Home() {
-  const [ping, setPing] = useState<PingState>({ status: 'loading' })
+function Splash() {
+  return <div className="min-h-dvh" aria-busy="true" />
+}
 
-  useEffect(() => {
-    supabase.rpc('ping').then(({ data, error }) => {
-      if (error) setPing({ status: 'error', message: error.message })
-      else setPing({ status: 'ok', at: new Date(data as string).toLocaleString() })
-    })
-  }, [])
+function Gate() {
+  const { loading, session, profile } = useAuth()
+  if (loading) return <Splash />
+  if (!session) return <Login />
+  if (!profile) return <Splash />
+  if (profile.must_change_password) return <ForcePasswordChange />
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-6 px-4 text-center">
-      <p className="label-caps">Coming soon</p>
-      <h1 className="font-display text-4xl leading-tight text-gold-500">The Gang Does a Bracket</h1>
-      <div className="rule-double w-40" />
-      <p className="text-sm text-ivory-muted" role="status">
-        {ping.status === 'loading' && 'Checking the database…'}
-        {ping.status === 'ok' && <>Supabase: connected · {ping.at}</>}
-        {ping.status === 'error' && <span className="text-danger">Supabase: {ping.message}</span>}
-      </p>
-    </main>
+    <Suspense fallback={<Splash />}>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="nominate" element={<Placeholder title="Nominate" note="Nominations open when Harry starts a bracket." />} />
+          <Route path="vote" element={<Placeholder title="Vote" note="Nothing to vote on yet." />} />
+          <Route path="bracket" element={<Placeholder title="Bracket" note="The bracket appears once seeding is locked." />} />
+          <Route path="archive" element={<Placeholder title="Archive" note="No past brackets yet." />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="admin" element={<Admin />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </Suspense>
   )
 }
 
 export default function App() {
   return (
     <HashRouter>
-      <Routes>
-        <Route path="*" element={<Home />} />
-      </Routes>
+      <AuthProvider>
+        <Gate />
+      </AuthProvider>
     </HashRouter>
   )
 }

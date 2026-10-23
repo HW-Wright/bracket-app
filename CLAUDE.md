@@ -13,7 +13,17 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - `npm test`: Vitest (pure logic in `src/**/*.test.ts`)
 - `npm run typecheck`, `npm run lint`, `npm run build`
 - `supabase start` / `supabase db reset`: local stack (Docker) for RLS/RPC tests
+- `npm run test:db`: pgTAP RLS tests in `supabase/tests/database` (local stack)
+- `npm run test:auth`: login + admin-users integration test (local stack + `supabase functions serve`)
+- `npm run seed:users` / `seed:users:local`: create users from gitignored `users.local.json` (idempotent)
 - `supabase db push`: apply migrations to the linked live project (ask Harry before destructive changes)
+- `supabase functions deploy <name> --use-api`: deploy an Edge Function
+
+## Auth model
+- Username login: `usernameToEmail()` in `supabase/functions/_shared/username.ts` maps `joe` to `joe@users.gang-bracket.invalid`. Shared by app, scripts and functions; keep it runtime-agnostic.
+- `profiles` (is_admin, must_change_password, active). Clients can only SELECT; writes go through service role (seed script, `admin-users` function). `is_admin()` is the helper for policies.
+- Deactivation = `active=false` + an auth ban.
+- Function EXECUTE is opt-in: default privileges are revoked, so every new function needs an explicit `grant execute ... to authenticated` (or anon).
 
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
@@ -24,4 +34,4 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Design: dark art deco, black + restrained muted gold. No Batman/DC references of any kind.
 
 ## Status
-Phase 1 (scaffold & deploy) in progress.
+Phase 1 done. Phase 2 (auth & users) in progress: built and deployed; live users not yet seeded.
