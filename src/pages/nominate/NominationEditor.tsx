@@ -66,7 +66,7 @@ function Row({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={`flex items-center gap-1 rounded-sm border bg-ink-900 pr-1 ${
-        isDragging ? 'z-10 border-gold-500 shadow-lg shadow-black' : duplicate ? 'border-gold-700' : 'border-line'
+        isDragging ? 'z-10 border-gold-500 shadow-lg shadow-black' : duplicate ? 'border-danger' : 'border-line'
       }`}
     >
       <button
