@@ -159,7 +159,7 @@ export default function AdminStage() {
   const rows = open.matchups.map((m) => ({ m, a: open.tallies[m.id]?.votes_a ?? 0, b: open.tallies[m.id]?.votes_b ?? 0 }))
 
   return (
-    <Card title="Stage control" aside={open.stage ? <Badge tone="live">Stage {open.stage.number}/10</Badge> : <Badge tone="yellow">Final</Badge>}>
+    <Card title="Stage control" aside={open.stage ? <Badge tone="live">Stage {open.stage.number}/{open.stageCount}</Badge> : <Badge tone="yellow">Final</Badge>}>
       <div className="flex flex-col gap-3">
         {open.stage ? (
           <>
@@ -177,7 +177,7 @@ export default function AdminStage() {
             </Button>
           </>
         ) : (
-          <p className="text-base text-muted">All ten stages are closed. The bracket is complete.</p>
+          <p className="text-base text-muted">Every stage is closed. The bracket is complete.</p>
         )}
         {lastClosed && (
           <>

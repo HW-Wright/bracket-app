@@ -42,6 +42,7 @@ export function useOpenStage(bracketId: string | undefined) {
   const [myVotes, setMyVotes] = useState<Record<string, string>>({})
   const [voters, setVoters] = useState<{ voters: number; total: number } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [stageCount, setStageCount] = useState(0)
   const instance = useId()
 
   const loadProgress = useCallback(async (b: string, n: number) => {
@@ -51,12 +52,9 @@ export function useOpenStage(bracketId: string | undefined) {
 
   const load = useCallback(async () => {
     if (!bracketId) return setLoading(false)
-    const { data: st } = await supabase
-      .from('stages')
-      .select('number, round, label, status')
-      .eq('bracket_id', bracketId)
-      .eq('status', 'open')
-      .maybeSingle()
+    const { data: all } = await supabase.from('stages').select('number, round, label, status').eq('bracket_id', bracketId)
+    const st = (all ?? []).find((x) => x.status === 'open') ?? null
+    setStageCount(all?.length ?? 0)
     setStage(st as Stage | null)
     if (!st) {
       setMatchups([])
@@ -123,5 +121,5 @@ export function useOpenStage(bracketId: string | undefined) {
     [myVotes, load],
   )
 
-  return { loading, stage, matchups, tallies, myVotes, voters, vote, reload: load }
+  return { loading, stage, stageCount, matchups, tallies, myVotes, voters, vote, reload: load }
 }

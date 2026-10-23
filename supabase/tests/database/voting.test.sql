@@ -41,17 +41,30 @@ select pg_temp.as_user('00000000-0000-0000-0000-0000000000b2');
 select lives_ok($$select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_b)$$, 'joe votes');
 select lives_ok($$select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_a)$$, 'joe switches his vote');
 select throws_ok($$select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 1)).entry_a)$$, 'P0001', 'That entry is not in this matchup', 'cannot vote for an entry outside the matchup');
-select throws_ok($$select public.cast_vote((pg_temp.m(1, 8)).id, (pg_temp.m(1, 8)).entry_a)$$, 'P0001', 'Voting is closed for this matchup', 'cannot vote in a stage that is not open');
+select throws_ok($$select public.cast_vote((pg_temp.m(2, 0)).id, (pg_temp.m(1, 0)).entry_a)$$, 'P0001', 'Voting is closed for this matchup', 'cannot vote in a stage that is not open');
 select throws_ok($$insert into public.votes (matchup_id, user_id, entry_id) select (pg_temp.m(1, 0)).id, auth.uid(), (pg_temp.m(1, 0)).entry_a$$, '42501', null, 'no direct vote writes');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c3');
 select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_b);
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
 select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_a);
+-- Everything else in the Round of 64 except game 2: Harry and Joe back side a (the higher seed).
+reset role;
+do $$
+declare mu record;
+begin
+  for mu in select * from public.matchups where round = 1 and slot >= 2 loop
+    perform pg_temp.claims('00000000-0000-0000-0000-0000000000a1');
+    perform public.cast_vote(mu.id, mu.entry_a);
+    perform pg_temp.claims('00000000-0000-0000-0000-0000000000b2');
+    perform public.cast_vote(mu.id, mu.entry_a);
+  end loop;
+end;
+$$;
 
 -- ---- Hidden voters, visible tallies (while open)
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b2');
-select is((select count(*)::int from public.votes), 1, 'while open, Joe sees only his own vote');
+select is((select count(*)::int from public.votes), 31, 'while open, Joe sees only his own 31 votes');
 select is((select count(*)::int from public.votes where user_id <> auth.uid()), 0, 'while open, Joe cannot see who else voted');
 select is((select votes_a || '-' || votes_b from public.matchup_tallies where matchup_id = (pg_temp.m(1, 0)).id), '2-1', 'but the live tally is visible: 2-1');
 select results_eq($$select voters, total from public.stage_progress('00000000-0000-0000-0000-00000000bb01', 1)$$, $$values (3, 3)$$, '3 of 3 have voted (counts only)');
@@ -75,7 +88,7 @@ select results_eq($$select status::text from public.stages where number in (1, 2
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b2');
 select is((select count(*)::int from public.votes where matchup_id = (pg_temp.m(1, 0)).id), 3, 'after close, voters are revealed to everyone');
 select throws_ok($$select public.cast_vote((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_b)$$, 'P0001', 'Voting is closed for this matchup', 'stage-1 votes are locked');
-select lives_ok($$select public.cast_vote((pg_temp.m(1, 8)).id, (pg_temp.m(1, 8)).entry_a)$$, 'joe votes in stage 2');
+select lives_ok($$select public.cast_vote((pg_temp.m(2, 0)).id, (pg_temp.m(2, 0)).entry_a)$$, 'joe votes in stage 2 (Round of 32)');
 
 -- ---- Undo
 reset role;
@@ -87,7 +100,7 @@ reset role;
 select is((select count(*)::int from public.votes v join public.matchups m on m.id = v.matchup_id where m.stage = 2), 0, 'votes in the newly opened stage are discarded');
 select results_eq($$select status::text from public.stages where number in (1, 2) order by number$$, $$values ('open'), ('pending')$$, 'stage 1 reopened, stage 2 pending');
 select ok((pg_temp.m(2, 0)).entry_a is null and (pg_temp.m(1, 0)).winner is null, 'winners pulled back out of R32');
-select is((select count(*)::int from public.votes v join public.matchups m on m.id = v.matchup_id where m.stage = 1), 3, 'stage-1 votes are kept');
+select is((select count(*)::int from public.votes v join public.matchups m on m.id = v.matchup_id where m.stage = 1), 63, 'stage-1 votes are kept (3 + 30 x 2)');
 
 select pg_temp.harry();
 select public.close_stage_and_advance('00000000-0000-0000-0000-00000000bb01');
@@ -121,17 +134,17 @@ begin
 end;
 $$;
 
-select is((select phase::text from public.brackets), 'complete', 'after stage 10 the bracket is complete');
+select is((select phase::text from public.brackets), 'complete', 'after the final stage the bracket is complete');
 select is((select count(*)::int from public.matchups where winner is null), 0, 'all 64 matchups decided');
-select is((select count(*)::int from public.stages where status = 'closed'), 10, 'all 10 stages closed');
+select is((select count(*)::int from public.stages where status = 'closed'), 6, 'all 6 stages closed');
 select is(pg_temp.seed((pg_temp.m(6, 0)).winner), 64, 'champion: seed 64 (carried by the override)');
 select is(pg_temp.seed((pg_temp.m(6, 0)).entry_b), 2, 'runner-up: seed 2, who could only meet the top half in the final');
 select is(pg_temp.seed((pg_temp.m(6, 1)).winner) || ' beat ' || pg_temp.seed(case when (pg_temp.m(6, 1)).winner = (pg_temp.m(6, 1)).entry_a then (pg_temp.m(6, 1)).entry_b else (pg_temp.m(6, 1)).entry_a end),
   '4 beat 3', 'third-place playoff between the semi-final losers: 4 beat 3');
 select throws_ok($$select public.override_matchup((pg_temp.m(1, 0)).id, (pg_temp.m(1, 0)).entry_a, 'OVERRIDE')$$, 'P0001', 'The next matchup is already decided; undo that stage first', 'cannot override once the next matchup is decided');
 
-select is(public.undo_last_advance('00000000-0000-0000-0000-00000000bb01', 'UNDO'), 10, 'undo works after completion');
-select is((select phase::text from public.brackets) || ' ' || (select status::text from public.stages where number = 10), 'live open', 'back to live with the final stage open');
+select is(public.undo_last_advance('00000000-0000-0000-0000-00000000bb01', 'UNDO'), 6, 'undo works after completion');
+select is((select phase::text from public.brackets) || ' ' || (select status::text from public.stages where number = 6), 'live open', 'back to live with the final stage open');
 
 reset role;
 select lives_ok($$delete from public.brackets where id = '00000000-0000-0000-0000-00000000bb01'$$, 'a bracket with votes can be deleted outright');

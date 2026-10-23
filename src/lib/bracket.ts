@@ -25,35 +25,19 @@ export const ROUNDS = [
   { round: 6, name: 'Final', matchups: 1 },
 ] as const
 
+/** One stage per round (Harry, 2026-10-23): each round is released in its entirety. */
 export const STAGE_LABELS = [
-  'Round of 64 · Quarter A',
-  'Round of 64 · Quarter B',
-  'Round of 64 · Quarter C',
-  'Round of 64 · Quarter D',
-  'Round of 32 · Top half',
-  'Round of 32 · Bottom half',
+  'Round of 64',
+  'Round of 32',
   'Round of 16',
   'Quarter-finals',
   'Semi-finals',
   'Final + third-place playoff',
 ] as const
 
-/** Which stage (1-10) a matchup belongs to. Round 6 slot 1 is the third-place playoff. */
-export function stageFor(round: number, slot: number): number {
-  switch (round) {
-    case 1:
-      return 1 + Math.floor(slot / 8)
-    case 2:
-      return 5 + Math.floor(slot / 8)
-    case 3:
-      return 7
-    case 4:
-      return 8
-    case 5:
-      return 9
-    default:
-      return 10
-  }
+/** Which stage a matchup belongs to: its round. Round 6 slot 1 is the third-place playoff. */
+export function stageFor(round: number, _slot: number): number {
+  return round
 }
 
 /** Seed-gap of an upset (winner seed minus loser seed), or 0 if the favourite won. */

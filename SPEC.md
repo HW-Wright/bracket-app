@@ -56,7 +56,7 @@ Phases, all advanced manually by Harry. No deadlines or timers anywhere (users a
 4. **Live:** seeding locked, voting runs stage by stage.
 5. **Complete:** champion and podium shown; bracket moves to the archive when Harry starts the next one.
 
-The home screen is phase-aware and always shows the single most relevant action (e.g. "Submit your nominations", "Vote in Round of 64, Section B", "See the champion").
+The home screen is phase-aware and always shows the single most relevant action (e.g. "Submit your nominations", "Vote in the Round of 64", "See the champion").
 
 ---
 
@@ -112,21 +112,17 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - **Standard 64-seed bracket order**, generated algorithmically: round one pairs sum to 65 (1 v 64, 32 v 33, etc.), arranged so seeds 1 and 2 can only meet in the final, seeds 1 to 4 sit in different quarters, and so on. Unit test this.
 - **Stages** (each stage is what Harry opens and closes with one button):
 
-| Stage | Round | Section | Matchups |
-|---|---|---|---|
-| 1 | Round of 64 | Quarter A | 8 |
-| 2 | Round of 64 | Quarter B | 8 |
-| 3 | Round of 64 | Quarter C | 8 |
-| 4 | Round of 64 | Quarter D | 8 |
-| 5 | Round of 32 | Top half | 8 |
-| 6 | Round of 32 | Bottom half | 8 |
-| 7 | Round of 16 | All | 8 |
-| 8 | Quarter-finals | All | 4 |
-| 9 | Semi-finals | All | 2 |
-| 10 | Final + third-place playoff | All | 2 |
+| Stage | Round | Matchups |
+|---|---|---|
+| 1 | Round of 64 | 32 |
+| 2 | Round of 32 | 16 |
+| 3 | Round of 16 | 8 |
+| 4 | Quarter-finals | 4 |
+| 5 | Semi-finals | 2 |
+| 6 | Final + third-place playoff | 2 |
 
-- Quarters are the four structural quarters of the bracket (each contains 16 entries), released in fixed order A to D. Halves are the top and bottom halves.
-- **Third-place playoff:** the two semi-final losers play each other in stage 10 alongside the final, to decide third place on the podium.
+- **Each round is one stage, presented in its entirety** (decided by Harry, 2026-10-23, replacing the original release of the Round of 64 in quarters and the Round of 32 in halves).
+- **Third-place playoff:** the two semi-final losers play each other in the final stage alongside the final, to decide third place on the podium.
 
 ---
 
@@ -151,7 +147,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
   3. **Ties (including 0-0) are decided by a random coin toss performed server-side** inside the function. Store the result and mark the matchup `decided_by = 'coin_toss'`; show a coin-toss badge on it everywhere.
   4. Reveals voter identities for the closed stage.
   5. Fills next-round matchups once both feeder matchups are decided.
-  6. Opens the next stage, or marks the bracket complete after stage 10.
+  6. Opens the next stage, or marks the bracket complete after the final stage.
 - **Undo last advance** (admin, for fixing mistakes): reverts the most recent push after a typed confirmation, warning that any votes cast in the newly opened stage will be discarded. Coin toss results already recorded are kept and reused if that matchup is still tied when re-closed, so a toss can never be rerolled.
 - **Override a matchup result** (admin, bug fixing only): requires typed confirmation and is shown publicly with an "Admin decision" badge, so the bracket stays transparent.
 
@@ -175,7 +171,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ## 10. Champion and podium
 
-- When stage 10 closes, show a **champion screen**: the winner presented as a full broadcast title card, a **podium** (1st champion, 2nd final loser, 3rd third-place playoff winner), and the champion's path.
+- When the final stage closes, show a **champion screen**: the winner presented as a full broadcast title card, a **podium** (1st champion, 2nd final loser, 3rd third-place playoff winner), and the champion's path.
 - Broadcast-style celebration (e.g. a champion title card) only; respect `prefers-reduced-motion`.
 
 ---
@@ -261,7 +257,7 @@ Write a `README.md` with:
 ## 16. Assumptions (Harry may change these)
 
 - Users can change their vote until the stage closes.
-- Stage sections release in fixed order (Quarter A to D, then top and bottom halves).
+- Each round is released as a single stage (no quarter/half sections).
 - A third-place playoff decides the podium's third place.
 - After nominations close, everyone sees all nominations grouped by user with ranks.
 - 15 nominations are required; incomplete lists at close are excluded (Harry may reopen to let people finish).

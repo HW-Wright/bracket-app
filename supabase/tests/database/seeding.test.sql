@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(43);
+select plan(44);
 
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'harry@test.invalid', 'authenticated', 'authenticated'),
@@ -137,8 +137,9 @@ select is(
   array[1,64,32,33,16,49,17,48,8,57,25,40,9,56,24,41,4,61,29,36,13,52,20,45,5,60,28,37,12,53,21,44,2,63,31,34,15,50,18,47,7,58,26,39,10,55,23,42,3,62,30,35,14,51,19,46,6,59,27,38,11,54,22,43],
   'SQL bracket_order matches the TypeScript bracketOrder');
 select results_eq($$select status::text from public.stages order by number$$,
-  $$values ('open'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending')$$,
-  'stage 1 open, the rest pending');
+  $$values ('open'), ('pending'), ('pending'), ('pending'), ('pending'), ('pending')$$,
+  'six stages, one per round: stage 1 open, the rest pending');
+select is((select count(*)::int from public.matchups where stage = 1), 32, 'stage 1 is the whole Round of 64');
 select is((select phase::text from public.brackets), 'live', 'bracket is live');
 select throws_ok(format($$select public.rename_entry(%L, 'late')$$, pg_temp.eid('Heat')), 'P0001', null, 'entries are frozen after lock');
 select lives_ok(format($$select public.set_entry_image(%L, '00000000-0000-0000-0000-00000000bb01/heat.webp')$$, pg_temp.eid('Heat')),

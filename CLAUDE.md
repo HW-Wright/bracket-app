@@ -39,7 +39,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Closing nominations runs `build_entries()`: one `entries` row per `entry_key` from complete lists; each counted nomination's `entry_id` = the entry it ORIGINALLY landed in. Reopening deletes entries.
 - Merge = `entries.merged_into` (target = earlier-created entry, so it keeps its tiebreak). Scores are always computed by `entry_standings()` over the merge tree with the best-rank-per-user rule, so unmerge is just clearing `merged_into`. `split_entry()` undoes an auto-combine by spelling.
 - Order: points desc, nominators desc, stored `tiebreak` asc. `tiebreak` is set once at insert and never rewritten.
-- `lock_seeding()` sets seeds 1-64, creates `stages` (10) and all `matchups` (round 1-6; round 6 slot 1 = third place; round r slot s fed by r-1 slots 2s/2s+1), opens stage 1, phase -> live.
+- `lock_seeding()` sets seeds 1-64, creates `stages` (6, one per round) and all `matchups` (round 1-6; round 6 slot 1 = third place; round r slot s fed by r-1 slots 2s/2s+1), opens stage 1 (the whole R64), phase -> live.
 - `bracket_order()` / `stage_for()` in SQL mirror `src/lib/bracket.ts`; seeding.test.sql checks parity.
 - Entry images: public bucket `entry-images`, admin-only writes (storage policies). Client resizes in `src/lib/image.ts`.
 - `npm run test:storage`: storage policy integration test (local).
@@ -47,6 +47,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 ## Voting & advancement
 - `votes` written only via `cast_vote()` while the stage is open. RLS: own rows always, everyone's once the stage is `closed`. Never subscribe to `votes` over Realtime (it isn't in the publication).
 - `matchup_tallies` (trigger-maintained, one row per matchup) is what clients read and subscribe to for live counts. `stages` and `brackets` are also in the Realtime publication.
+- Stages: one per round (6). Advance/undo look up whether a next stage exists rather than assuming a count.
 - `close_stage_and_advance()`: one transaction; ties use stored `coin_toss_winner` if still valid else `random()` (then stored). `feed_forward()` fills the next round / third place. `stage_advances` is the undo stack for `undo_last_advance()` (typed UNDO). `override_matchup()` (typed OVERRIDE) only while the next matchup is undecided.
 - `npm run test:realtime`: Realtime integration test (local).
 - `npm run test-bracket -- create|delete [--local]`: throwaway "Test – ignore" bracket in review with 64 dummy entries (refuses if a real bracket is active).

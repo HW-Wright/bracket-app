@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bracketOrder, firstRoundPairs, stageFor, upsetMargin } from './bracket'
+import { bracketOrder, firstRoundPairs, STAGE_LABELS, stageFor, upsetMargin } from './bracket'
 
 const order = bracketOrder(64)
 const slotOfSeed = (seed: number) => Math.floor(order.indexOf(seed) / 2) // first-round slot 0..31
@@ -50,28 +50,14 @@ describe('bracketOrder', () => {
 })
 
 describe('stageFor', () => {
-  it('splits round one into four quarters of 8 matchups (16 entries each)', () => {
-    const quarters = [1, 2, 3, 4].map((stage) =>
-      firstRoundPairs()
-        .filter((_, slot) => stageFor(1, slot) === stage)
-        .flat(),
-    )
-    for (const q of quarters) expect(q).toHaveLength(16)
-    // Each of seeds 1-4 heads a different quarter.
-    expect(quarters.map((q) => Math.min(...q)).sort()).toEqual([1, 2, 3, 4])
+  it('releases each round in its entirety as one stage', () => {
+    const stage1 = firstRoundPairs().filter((_, slot) => stageFor(1, slot) === 1)
+    expect(stage1).toHaveLength(32)
+    expect([stageFor(2, 0), stageFor(2, 15), stageFor(3, 7), stageFor(4, 0), stageFor(5, 1), stageFor(6, 0), stageFor(6, 1)]).toEqual([2, 2, 3, 4, 5, 6, 6])
   })
 
-  it('maps later rounds to stages 5-10', () => {
-    expect([stageFor(2, 0), stageFor(2, 7), stageFor(2, 8), stageFor(2, 15)]).toEqual([5, 5, 6, 6])
-    expect([stageFor(3, 3), stageFor(4, 0), stageFor(5, 1), stageFor(6, 0), stageFor(6, 1)]).toEqual([7, 8, 9, 10, 10])
-  })
-
-  it('round-two halves line up with round-one quarters', () => {
-    // R32 slot s is fed by R64 slots 2s and 2s+1, so top half (stage 5) draws from quarters A and B.
-    for (let s = 0; s < 16; s++) {
-      const feeders = [stageFor(1, 2 * s), stageFor(1, 2 * s + 1)]
-      expect(feeders.every((f) => (stageFor(2, s) === 5 ? f <= 2 : f >= 3))).toBe(true)
-    }
+  it('has six stages', () => {
+    expect(STAGE_LABELS).toHaveLength(6)
   })
 })
 
