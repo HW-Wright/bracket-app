@@ -267,4 +267,4 @@ Write a `README.md` with:
 - 15 nominations are required; incomplete lists at close are excluded (Harry may reopen to let people finish).
 - Seeding tiebreak order is points, then distinct nominators, then the stored random value.
 - Exact normalised matches auto-combine at close (splittable); fuzzy matches need Harry's confirmation.
-- Harry can abandon (delete) any bracket that has not gone live, with a typed confirmation.
+- Harry can abandon (delete) the active bracket at any phase, including live and complete, with a typed confirmation of its title. Votes, results and images go with it.

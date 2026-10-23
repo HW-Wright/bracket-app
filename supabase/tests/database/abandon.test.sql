@@ -34,8 +34,8 @@ select is((select count(*)::int from public.nominations), 0, 'its nominations ca
 
 insert into public.brackets (id, title, phase) values ('00000000-0000-0000-0000-00000000bb02', 'Live one', 'live');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
-select throws_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb02', 'Live one')$$,
-  'P0001', 'Brackets that have gone live cannot be abandoned', 'live brackets are protected');
+select lives_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb02', 'Live one')$$,
+  'live brackets can be abandoned too (typed title)');
 
 select * from finish();
 rollback;

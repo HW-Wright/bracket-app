@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { rpcMessage, useBracket, type Bracket, type BracketPhase } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
 import { Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
+import { IMAGE_BUCKET } from '../../lib/image'
 import { supabase } from '../../lib/supabase'
 
 interface UserStatus {
@@ -105,12 +106,22 @@ export default function AdminBracket() {
   }
 
   async function abandon() {
-    const typed = prompt(
-      `This permanently deletes “${bracket!.title}” and everyone's nominations for it.\n\nType the bracket title to confirm:`,
-    )
+    const b = bracket!
+    const lost =
+      b.phase === 'live' || b.phase === 'complete'
+        ? "everyone's nominations, every vote and every result so far, and all entry images. It will not go to the archive"
+        : b.phase === 'review'
+          ? "everyone's nominations, your review work and any entry images"
+          : "everyone's nominations"
+    const typed = prompt(`This permanently deletes “${b.title}”: ${lost}. This can't be undone.\n\nType the bracket title to confirm:`)
     if (typed === null) return
     setBusy(true)
-    const { error } = await supabase.rpc('abandon_bracket', { p_bracket_id: bracket!.id, p_confirm_title: typed })
+    const { error } = await supabase.rpc('abandon_bracket', { p_bracket_id: b.id, p_confirm_title: typed })
+    if (!error) {
+      // The bracket's images live under its folder in storage; tidy them up too.
+      const { data: files } = await supabase.storage.from(IMAGE_BUCKET).list(b.id, { limit: 1000 })
+      if (files?.length) await supabase.storage.from(IMAGE_BUCKET).remove(files.map((f) => `${b.id}/${f.name}`))
+    }
     setBusy(false)
     setError(rpcMessage(error))
     await refresh()
@@ -126,6 +137,14 @@ export default function AdminBracket() {
           <p className="mb-4 text-base text-muted">“{bracket.title}” will move to the archive.</p>
         )}
         <BracketForm onDone={refresh} />
+        {bracket && (
+          <>
+            <Button variant="danger" disabled={busy} onClick={abandon} className="mt-6 w-full">
+              Delete “{bracket.title}” instead of archiving…
+            </Button>
+            <ErrorText>{error}</ErrorText>
+          </>
+        )}
       </Card>
     )
   }
@@ -244,7 +263,7 @@ export default function AdminBracket() {
           </Link>
         )}
 
-        {(bracket.phase === 'nominations' || bracket.phase === 'review') && (
+        {bracket.phase !== 'draft' && (
           <Button variant="danger" disabled={busy} onClick={abandon} className="mt-4">
             Abandon bracket…
           </Button>

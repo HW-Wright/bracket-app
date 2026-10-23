@@ -33,7 +33,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Harry's decision: exact `entryKey` matches auto-combine at close (splittable); fuzzy matches are suggestions only. See SPEC §5.2.
 - A list counts only when complete: exactly 15, no repeated `entry_key` (`nomination_list_status()`, mirrored by `listStatus()` in TS). Incomplete lists are kept but excluded from seeding.
 - SQL `normalise_entry()` / `entry_key()` mirror the TS versions; `complete_lists.test.sql` checks parity cases.
-- `abandon_bracket()` deletes a pre-live bracket: every table referencing `brackets` must `on delete cascade`.
+- `abandon_bracket()` deletes the active bracket in any phase (typed title): every table referencing `brackets` must `on delete cascade`. The UI then removes its images from storage.
 
 ## Review, seeding & bracket structure
 - Closing nominations runs `build_entries()`: one `entries` row per `entry_key` from complete lists; each counted nomination's `entry_id` = the entry it ORIGINALLY landed in. Reopening deletes entries.
