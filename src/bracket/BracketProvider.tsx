@@ -11,6 +11,8 @@ export interface Bracket {
   created_at: string
   nominations_opened_at: string | null
   nominations_closed_at: string | null
+  locked_at: string | null
+  completed_at: string | null
 }
 
 interface BracketState {
@@ -29,7 +31,7 @@ export function BracketProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     const { data } = await supabase
       .from('brackets')
-      .select('id, title, description, phase, created_at, nominations_opened_at, nominations_closed_at')
+      .select('id, title, description, phase, created_at, nominations_opened_at, nominations_closed_at, locked_at, completed_at')
       .is('archived_at', null)
       .maybeSingle()
     setBracket(data)
@@ -40,7 +42,15 @@ export function BracketProvider({ children }: { children: ReactNode }) {
     refresh()
     const onVisible = () => document.visibilityState === 'visible' && refresh()
     document.addEventListener('visibilitychange', onVisible)
-    return () => document.removeEventListener('visibilitychange', onVisible)
+    // Phase changes (e.g. Harry locks seeding) show up without a reload.
+    const channel = supabase
+      .channel('brackets')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'brackets' }, () => refresh())
+      .subscribe()
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      supabase.removeChannel(channel)
+    }
   }, [refresh])
 
   const value = useMemo(() => ({ loading, bracket, refresh }), [loading, bracket, refresh])

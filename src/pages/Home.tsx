@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracket, type Bracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
+import { useOpenStage } from '../bracket/useStage'
 import { Card, Led, PageTitle } from '../components/ui'
 import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
 import { supabase } from '../lib/supabase'
@@ -60,6 +61,21 @@ function NominationsOpen({ bracket }: { bracket: Bracket }) {
   )
 }
 
+function VotingLive({ bracket }: { bracket: Bracket }) {
+  const { stage, matchups, myVotes, voters } = useOpenStage(bracket.id)
+  if (!stage) return null
+  const mine = matchups.filter((m) => myVotes[m.id]).length
+  return (
+    <div className="flex flex-col gap-5">
+      <Action to="/vote">{mine === matchups.length && mine > 0 ? `Review your votes` : `Vote in ${stage.label}`}</Action>
+      <div className="grid grid-cols-2 gap-2.5" role="status">
+        <Stat value={`${mine}/${matchups.length}`} label="Your votes" />
+        {voters && <Stat value={`${voters.voters}/${voters.total}`} label="People voted" />}
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const { profile } = useAuth()
   const { bracket, loading } = useBracket()
@@ -108,7 +124,9 @@ export default function Home() {
           <Action to="/nominate">See everyone's nominations</Action>
         </div>
       )}
-      {profile?.is_admin && bracket.phase !== 'live' && bracket.phase !== 'complete' && (
+      {bracket.phase === 'live' && <VotingLive bracket={bracket} />}
+      {bracket.phase === 'complete' && <Action to="/bracket">See the champion</Action>}
+      {profile?.is_admin && (
         <Link to="/admin" className="mt-8 block text-center text-base font-bold text-orange uppercase underline-offset-4 hover:underline">
           Admin controls →
         </Link>

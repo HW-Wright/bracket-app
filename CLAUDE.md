@@ -44,6 +44,13 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Entry images: public bucket `entry-images`, admin-only writes (storage policies). Client resizes in `src/lib/image.ts`.
 - `npm run test:storage`: storage policy integration test (local).
 
+## Voting & advancement
+- `votes` written only via `cast_vote()` while the stage is open. RLS: own rows always, everyone's once the stage is `closed`. Never subscribe to `votes` over Realtime (it isn't in the publication).
+- `matchup_tallies` (trigger-maintained, one row per matchup) is what clients read and subscribe to for live counts. `stages` and `brackets` are also in the Realtime publication.
+- `close_stage_and_advance()`: one transaction; ties use stored `coin_toss_winner` if still valid else `random()` (then stored). `feed_forward()` fills the next round / third place. `stage_advances` is the undo stack for `undo_last_advance()` (typed UNDO). `override_matchup()` (typed OVERRIDE) only while the next matchup is undecided.
+- `npm run test:realtime`: Realtime integration test (local).
+- FKs into `entries` cascade/set null so deleting a bracket removes everything.
+
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
 - RLS on every table. Privacy rules (blind nominations, hidden voters) are enforced in the DB, not just the UI.
@@ -53,4 +60,4 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Design: direction D "Broadcast Scoreboard" (SPEC §13): navy + court orange broadcast graphics, slanted `Badge`s, amber LED numbers via `Led` (`font-led`). Tokens in `src/index.css`; shared pieces in `src/components/ui.tsx`. Every matchup goes in a "GAME n" box. No NCAA trademarks.
 
 ## Status
-Phases 1–3 done, design direction D applied. Phase 4 (review & seeding) built; next Phase 5 (voting & advancement).
+Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 (voting & advancement) built; next Phase 6 (history, entry pages, stats, champion, archive).

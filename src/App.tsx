@@ -12,6 +12,7 @@ import Profile from './pages/Profile'
 const Admin = lazy(() => import('./pages/admin/Admin'))
 const Nominate = lazy(() => import('./pages/nominate/Nominate'))
 const AdminReview = lazy(() => import('./pages/admin/review/AdminReview'))
+const Vote = lazy(() => import('./pages/Vote'))
 
 function Splash() {
   return <div className="min-h-dvh" aria-busy="true" />
@@ -31,7 +32,7 @@ function Gate() {
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="nominate" element={<Nominate />} />
-            <Route path="vote" element={<Placeholder title="Vote" note="Nothing to vote on yet." />} />
+            <Route path="vote" element={<Vote />} />
             <Route path="bracket" element={<Placeholder title="Bracket" note="The bracket appears once seeding is locked." />} />
             <Route path="stats" element={<Placeholder title="Stats" note="Upsets and running vote totals appear once voting starts." />} />
             <Route path="archive" element={<Placeholder title="Archive" note="No past brackets yet." />} />
