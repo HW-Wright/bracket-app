@@ -31,15 +31,17 @@ export default function Vote() {
   return (
     <>
       <div className="mb-5 flex items-end justify-between gap-3">
-        <div className="flex flex-col items-start gap-1">
-          <Badge className="ml-1">
+        <div className="flex min-w-0 flex-col items-start">
+          <Badge>
             Stage {stage.number}
             {sectionLabel ? ` · ${sectionLabel}` : ''}
           </Badge>
-          <h1 className="font-display text-3xl leading-tight uppercase">{ROUND_NAMES[stage.round]}</h1>
+          <div className="plate bg-white py-1.5 pr-8 pl-3 text-navy-950">
+            <h1 className="font-display text-[28px] leading-[1.05] font-extrabold uppercase italic">{ROUND_NAMES[stage.round]}</h1>
+          </div>
         </div>
-        <div className="led border-2 border-line px-2.5 py-1 text-center" role="status">
-          <span className="block font-led text-2xl leading-7 text-amber">
+        <div className="led shrink-0 border border-line px-2.5 py-1 text-center" role="status">
+          <span className="block font-led text-2xl leading-7 font-extrabold text-amber">
             {mine}/{matchups.length}
           </span>
           <span className="text-[11px] font-bold tracking-[0.15em] text-muted">YOU'VE VOTED</span>

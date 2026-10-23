@@ -66,7 +66,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Client env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (public). `SUPABASE_SECRET_KEY` only in gitignored `.env` and function secrets. Never commit `.env` or `users.local.json`.
 - GitHub Actions reads the public values from repo **variables** (not secrets) of the same names.
 - Commit after each build phase, with tests passing.
-- Design: direction D "Broadcast Scoreboard" (SPEC §13): navy + court orange broadcast graphics, slanted `Badge`s, amber LED numbers via `Led` (`font-led`). Tokens in `src/index.css`; shared pieces in `src/components/ui.tsx`. Every matchup goes in a "GAME n" box. No NCAA trademarks.
+- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, white `plate` title plates, panels with navy-700 header strips. Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
 
 ## Status
 Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 done (6 stages, one per round). Phase 6 built; next Phase 7 (design polish) and 8 (dry run).

@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Design tokens: direction D "Broadcast Scoreboard" (SPEC section 13). */
+/* Design tokens: direction D colours with direction F ("Saturday Results Show") layouts and type (SPEC section 13). */
 @theme {
   --color-navy-950: #0a1640; /* page */
   --color-navy-900: #0e1b4d; /* panel headers */
@@ -18,9 +18,10 @@
   --color-danger: #ff6b6b; /* red text on navy */
   --color-ok: #7ee08a;
 
-  --font-display: 'Russo One', 'Arial Black', sans-serif;
-  --font-led: 'DotGothic16', ui-monospace, monospace;
-  --font-sans: 'Saira Condensed', 'Arial Narrow', ui-sans-serif, sans-serif;
+  --font-display: 'Roboto Condensed', 'Arial Narrow', sans-serif; /* headlines: 800 italic caps */
+  --font-led: 'Roboto Condensed', 'Arial Narrow', sans-serif; /* numbers: bold condensed */
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* teleprinter crawls, classified results */
+  --font-sans: 'Roboto Condensed', 'Arial Narrow', ui-sans-serif, sans-serif;
 }
 
 @layer base {
@@ -37,16 +38,19 @@
   @apply text-sm font-bold uppercase tracking-[0.15em] text-muted;
 }
 
-/* Slanted broadcast caption/badge. */
+/* Broadcast tab/caption: straight edges, italic caps (direction F). */
 @utility slant {
-  transform: skewX(-12deg);
+  font-style: italic;
 }
 
-/* Dark dot-matrix LED inset for numbers. */
+/* Title plate / call-to-action bar with an angled right edge (direction F). */
+@utility plate {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+/* Dark inset behind numbers (amber digits). */
 @utility led {
-  background-color: var(--color-led);
-  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.2px);
-  background-size: 4px 4px;
+  background-color: var(--color-navy-900);
 }
 
 /* Room for the sticky header / bottom bars when the browser scrolls a focused field into view. */

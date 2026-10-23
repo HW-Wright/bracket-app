@@ -23,7 +23,7 @@ function Tab({ to, label, icon }: { to: string; label: string; icon: string }) {
       end={to === '/'}
       className={({ isActive }) =>
         `group flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-bold tracking-wider uppercase ${
-          isActive ? 'bg-navy-700 text-white' : 'text-muted'
+          isActive ? 'bg-navy-700 font-extrabold text-white shadow-[inset_0_3px_0_var(--color-orange)]' : 'text-muted'
         }`
       }
     >
@@ -58,18 +58,22 @@ function Ticker() {
       }[bracket.phase].filter(Boolean)
 
   return (
-    <Crawl
-      label="News"
-      items={items}
-      pinned={
-        live && (
-          <span className="flex items-center gap-1.5 text-danger">
-            <span className="h-2 w-2 rounded-full bg-live motion-safe:animate-pulse" aria-hidden />
-            LIVE
-          </span>
-        )
-      }
-    />
+    <div className="border-b border-line">
+      <Crawl
+        label="News"
+        items={items}
+        pinned={
+          live ? (
+            <span className="flex items-center gap-1.5 bg-live px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-white italic">
+              <span className="h-2 w-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden />
+              LIVE
+            </span>
+          ) : (
+            <span className="flex items-center bg-orange px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-navy-950 italic">LATEST</span>
+          )
+        }
+      />
+    </div>
   )
 }
 
@@ -90,7 +94,7 @@ function ResultsCrawl() {
       <Crawl
         label={`${results.stage.label} results`}
         items={results.lines}
-        pinned={<span className="slant bg-yellow px-2 font-display text-[11px] text-navy-950">{round} RESULTS</span>}
+        pinned={<span className="flex items-center bg-white px-2.5 font-sans text-[12px] font-extrabold text-navy-950 italic">{round} RESULTS</span>}
       />
     </div>
   )
@@ -101,18 +105,18 @@ export default function Layout() {
   useKeyboardAware()
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 bg-led pt-[env(safe-area-inset-top)] shadow-[0_3px_0_var(--color-yellow)]">
+      <header className="sticky top-0 z-10 bg-navy-900 pt-[env(safe-area-inset-top)]">
         <Ticker />
-        <div className="flex h-[52px] items-center justify-between border-b-4 border-orange bg-navy-800 pr-2 pl-4">
-          <Link to="/" className="font-display text-lg italic uppercase">
-            The Gang <span className="text-orange">Does a Bracket</span>
+        <div className="flex h-[52px] items-center justify-between border-b-[3px] border-orange bg-navy-800 pr-2 pl-4">
+          <Link to="/" className="font-display text-[21px] font-extrabold uppercase italic">
+            The Gang <span className="font-semibold text-orange">Does a Bracket</span>
           </Link>
           <Link
             to="/profile"
             aria-label="Profile"
             className="flex h-11 w-11 items-center justify-center"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-orange font-display text-sm">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white font-display text-[15px] font-extrabold text-navy-950">
               {profile?.display_name.charAt(0).toUpperCase()}
             </span>
           </Link>
@@ -123,7 +127,7 @@ export default function Layout() {
       </main>
       <nav
         aria-label="Main"
-        className="hide-with-keyboard pin-to-visible-bottom fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-orange bg-navy-800 pb-[env(safe-area-inset-bottom)]"
+        className="hide-with-keyboard pin-to-visible-bottom fixed inset-x-0 bottom-0 z-10 border-t border-line bg-navy-800 pb-[env(safe-area-inset-bottom)]"
       >
         <div className="mx-auto flex max-w-xl">
           <Tab to="/" label="Home" icon="home" />

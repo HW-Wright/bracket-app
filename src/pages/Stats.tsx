@@ -23,11 +23,11 @@ import {
 } from '../lib/stats'
 import { supabase } from '../lib/supabase'
 
-/** Broadcast segment banner: a slanted yellow caption bar with an orange offset shadow. */
+/** Broadcast segment tag under the title. */
 function SeanZone() {
   return (
-    <div className="-mt-2 mb-6 ml-1.5 w-fit -skew-x-12 border-l-[6px] border-orange bg-yellow px-4 py-1.5 shadow-[4px_4px_0_var(--color-orange)]">
-      <p className="font-display text-xl text-navy-950 uppercase italic">The Sean Zone</p>
+    <div className="-mt-3 mb-5 w-fit bg-yellow px-3 py-1">
+      <p className="font-display text-lg font-extrabold text-navy-950 uppercase italic">The Sean Zone</p>
     </div>
   )
 }
@@ -84,7 +84,7 @@ function JumpMenu() {
             key={id}
             type="button"
             onClick={() => go(id)}
-            className="slant min-h-9 shrink-0 bg-navy-800 px-3 text-sm font-extrabold tracking-wider whitespace-nowrap text-white uppercase hover:bg-orange hover:text-navy-950"
+            className="min-h-9 shrink-0 bg-navy-700 px-3 text-sm font-extrabold tracking-wide whitespace-nowrap text-white uppercase hover:bg-orange hover:text-navy-950"
           >
             {label}
           </button>
@@ -275,27 +275,28 @@ export default function Stats() {
           )}
         </Section>
 
-        <Section id="upsets" title="Upsets" blurb="Lower seeds beating higher seeds, biggest gap first." aside={<Badge tone="live">{ups.length}</Badge>}>
+        <Section id="upsets" title="Classified results · upsets" blurb="Lower seeds beating higher seeds, biggest gap first (round shown on each entry page)." aside={<Badge tone="live">{ups.length}</Badge>}>
           {ups.length === 0 ? (
             <Empty>No upsets yet: every higher seed has won so far.</Empty>
           ) : (
-            <ol className="-mx-4 -mb-4">
+            /* Classified-results style: teleprinter type, winner first. */
+            <ol className="-mx-4 -mb-4 bg-navy-900 py-1 font-mono text-[13px] font-semibold text-amber uppercase">
               {ups.map((u) => {
                 const t = data.tallies[u.matchup.id]
-                const score = t && (u.matchup.winner === u.matchup.a?.id ? `${t.votes_a}–${t.votes_b}` : `${t.votes_b}–${t.votes_a}`)
+                const [ws, ls] = t ? (u.matchup.winner === u.matchup.a?.id ? [t.votes_a, t.votes_b] : [t.votes_b, t.votes_a]) : ['', '']
                 return (
-                  <li key={u.matchup.id} className="grid grid-cols-[minmax(0,1fr)_58px] items-center gap-3 border-t border-line py-2 pr-3 pl-4">
-                    <span className="flex min-w-0 flex-col">
-                      <span className="text-lg leading-6">
-                        <EntryLink e={u.winner} /> <span className="font-semibold text-muted">def.</span> <EntryLink e={u.loser} />
-                      </span>
-                      <span className="text-sm font-semibold text-muted">
-                        {score}
-                        {u.matchup.decided_by === 'coin_toss' && ' · coin toss'}
-                        {u.matchup.decided_by === 'admin' && ' · admin decision'} · {isThirdPlace(u.matchup) ? 'Third-place playoff' : roundName(u.matchup.round)}
-                      </span>
+                  <li key={u.matchup.id} className="grid grid-cols-[minmax(0,1fr)_22px_auto] items-center gap-x-2 border-b border-line/60 px-3 py-1.5 last:border-0">
+                    <Link to={`/entry/${u.winner.id}`} className="truncate text-white hover:text-amber">
+                      ({u.winner.seed}) {u.winner.name}
+                    </Link>
+                    <span className="text-right text-white">{ws}</span>
+                    <span className={`row-span-2 self-center pl-1 ${u.matchup.decided_by === 'votes' ? 'text-danger' : 'text-yellow'}`}>
+                      {u.matchup.decided_by === 'coin_toss' ? 'TOSS' : u.matchup.decided_by === 'admin' ? 'ADMIN' : 'SHOCK'}+{u.margin}
                     </span>
-                    <span className="led py-1 text-center font-led text-lg text-danger">+{u.margin}</span>
+                    <Link to={`/entry/${u.loser.id}`} className="truncate hover:text-white">
+                      ({u.loser.seed}) {u.loser.name}
+                    </Link>
+                    <span className="text-right">{ls}</span>
                   </li>
                 )
               })}
@@ -303,7 +304,7 @@ export default function Stats() {
           )}
         </Section>
 
-        <Section id="houdini" title="Houdini" blurb="Narrowest escapes: wins by a single vote, plus coin tosses survived.">
+        <Section id="houdini" title="Houdini · narrow escapes" blurb="Narrowest escapes: wins by a single vote, plus coin tosses survived.">
           {escapes.length === 0 ? (
             noVotesYet
           ) : (
@@ -370,26 +371,26 @@ export default function Stats() {
           </ol>
         </Section>
 
-        <Section id="totals" title="Total votes" blurb="Every vote each entry has received across all rounds, live votes included.">
+        <Section id="totals" title="League table · total votes" blurb="Every vote each entry has received across all rounds, live votes included.">
           <div className="-mx-4 -mb-4">
-            <div className="grid grid-cols-[26px_40px_minmax(0,1fr)_48px_44px] items-center gap-2 px-3 py-1.5 text-xs font-bold tracking-widest text-muted uppercase">
-              <span>#</span>
+            <div className="grid grid-cols-[30px_34px_minmax(0,1fr)_26px_26px_46px] items-center gap-1.5 px-3 py-1.5 text-xs font-extrabold tracking-wide text-muted uppercase">
+              <span>Pos</span>
               <span>Seed</span>
               <span>Entry</span>
+              <span className="text-center">W</span>
+              <span className="text-center">L</span>
               <span className="text-right">Votes</span>
-              <span className="text-right">W–L</span>
             </div>
             <ol>
               {shown.map((t, i) => (
-                <li key={t.entry.id} className="border-t border-line">
-                  <Link to={`/entry/${t.entry.id}`} className="grid min-h-11 grid-cols-[26px_40px_minmax(0,1fr)_48px_44px] items-center gap-2 px-3 hover:bg-navy-700">
-                    <span className="font-display text-yellow">{i + 1}</span>
-                    <span className="led py-0.5 text-center font-led text-amber">{t.entry.seed}</span>
-                    <span className="truncate text-lg font-semibold">{t.entry.name}</span>
-                    <span className="text-right font-led text-xl text-amber">{t.votes}</span>
-                    <span className="text-right text-base font-bold">
-                      {t.wins}–{t.losses}
-                    </span>
+                <li key={t.entry.id} className={i % 2 === 0 ? 'bg-navy-700/60' : ''}>
+                  <Link to={`/entry/${t.entry.id}`} className="grid min-h-10 grid-cols-[30px_34px_minmax(0,1fr)_26px_26px_46px] items-center gap-1.5 px-3 text-[16px] hover:bg-navy-700">
+                    <span className="font-extrabold">{i + 1}</span>
+                    <span className="font-bold text-muted">{t.entry.seed}</span>
+                    <span className="truncate font-bold">{t.entry.name}</span>
+                    <span className="text-center">{t.wins}</span>
+                    <span className="text-center">{t.losses}</span>
+                    <span className="text-right font-extrabold">{t.votes}</span>
                   </Link>
                 </li>
               ))}

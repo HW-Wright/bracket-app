@@ -241,7 +241,7 @@ export default function AdminBracket() {
             )}
             <Link
               to="/admin/review"
-              className="flex min-h-14 -skew-x-8 items-center justify-center bg-white px-4 font-display text-xl text-navy-950 uppercase shadow-[5px_5px_0_var(--color-orange)] hover:bg-yellow"
+              className="plate flex min-h-14 items-center bg-orange pr-8 pl-4 font-display text-xl font-extrabold text-navy-950 uppercase italic hover:bg-yellow"
             >
               Review &amp; seeding ▸
             </Link>

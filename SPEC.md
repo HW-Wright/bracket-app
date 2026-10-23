@@ -211,7 +211,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ## 13. Design
 
-**Direction D, "Broadcast Scoreboard"** (chosen by Harry, 2026-10-23, replacing the original art deco brief). Reference mockups: the Bracket Theme Directions canvas, row D (Home, Vote, Stats).
+**Direction D colours with direction F layouts** (Harry: D chosen 2026-10-23, F's "Saturday Results Show" layouts and type adopted 2026-10-24, keeping D's colour scheme). Reference mockups: the Bracket Theme Directions canvas, rows D and F.
 
 ### Mood
 - A retro arcade take on a 90s TV sports broadcast of a college basketball tournament: on-screen broadcast graphics (slanted banners and caption bars, LIVE badge) combined with arena LED scoreboard numbers.
@@ -223,17 +223,19 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - LED: amber `#ffb21e` digits on dark dot-matrix insets (`#05091c` + fine dot texture).
 - Status: red `#e8343a` (LIVE, TIED, upsets, errors), muted text `#aab6e0`, text white.
 
-### Typography
-- Display: **Russo One** (titles, wordmark in italic, buttons, VS badge).
-- Numbers: **DotGothic16** on LED insets for every seed, vote count, score, stage counter and progress fraction.
-- Body and controls: **Saira Condensed** (500–800), uppercase letter-spaced for labels.
+### Typography (direction F format, adopted 2026-10-24)
+- Headlines, buttons and tabs: **Roboto Condensed** 800 italic caps. Body and controls: Roboto Condensed 500–700.
+- Teleprinter text (both crawls, classified results): **IBM Plex Mono** 600 caps in amber.
+- Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
-### Motifs
-- Slanted (skewX) caption bars and badges for eyebrows and section labels; slanted pick bars with a yellow offset shadow on the selected one.
-- LED ticker strip at the top: a pinned LIVE badge with the current phase and progress crawling across like a sports-channel news ticker.
-- Results crawl under the bottom tab bar: every result from the most recently closed round, scrolling the same way (hidden until a round has closed).
-- **Every matchup sits in its own "GAME n" box** (bordered panel with an LED header strip: game number left, VOTES / TIED / result right), so it's always clear which two entries face each other. Inside: two pick bars with a tally bar and VS (or TIED) badge between them.
-- Coin-toss and admin-decision badges in the same slanted-badge style.
+### Motifs (direction F layouts in direction D colours)
+- Straight-edged italic tabs for eyebrows, statuses and section labels (no skew).
+- White **title plates** with an angled right edge; the main call to action is an orange bar with the same angled edge.
+- Panels with a bright-navy header strip (italic caps title) over a navy body.
+- Top crawl: pinned LIVE (red) or LATEST (orange) tab, teleprinter feed. Bottom crawl under the tab bar: pinned white "R32 RESULTS" tab with the latest round's results.
+- **Every matchup sits in its own "MATCH n" box**: header strip with LIVE / LEVEL / FT / COIN TOSS / ADMIN status, then two rows (seed, image, name, white score box). Your pick and the winner fill orange; a level score turns the boxes yellow.
+- Home has a "Latest scores" results panel; Stats uses a classified-results list for upsets and a league table for total votes.
+- Coin-toss and admin-decision tags use the same tab style.
 
 ### Usability
 - Mobile-first; minimum 44px tap targets; works one-handed.

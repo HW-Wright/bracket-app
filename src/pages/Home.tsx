@@ -9,12 +9,12 @@ import { Card, Led, PageTitle } from '../components/ui'
 import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
 import { supabase } from '../lib/supabase'
 
-/** The one big call to action: white slanted broadcast bar with an orange offset shadow. */
+/** The one big call to action: an orange bar with an angled right edge. */
 function Action({ to, children }: { to: string; children: string }) {
   return (
     <Link
       to={to}
-      className="mx-1.5 flex min-h-14 -skew-x-8 items-center justify-center bg-white px-4 text-center font-display text-xl text-navy-950 uppercase shadow-[5px_5px_0_var(--color-orange)] hover:bg-yellow"
+      className="plate flex min-h-14 items-center bg-orange pr-8 pl-4 font-display text-[22px] leading-tight font-extrabold text-navy-950 uppercase italic hover:bg-yellow"
     >
       {children} ▸
     </Link>
@@ -63,9 +63,14 @@ function NominationsOpen({ bracket }: { bracket: Bracket }) {
 }
 
 function VotingLive({ bracket }: { bracket: Bracket }) {
-  const { stage, matchups, myVotes, voters } = useOpenStage(bracket.id)
+  const { stage, matchups, myVotes, voters, tallies } = useOpenStage(bracket.id)
   if (!stage) return null
   const mine = matchups.filter((m) => myVotes[m.id]).length
+  // Latest scores: the busiest games in the open round, like a results panel.
+  const latest = [...matchups]
+    .sort((x, y) => (tallies[y.id]?.votes_a ?? 0) + (tallies[y.id]?.votes_b ?? 0) - ((tallies[x.id]?.votes_a ?? 0) + (tallies[x.id]?.votes_b ?? 0)))
+    .slice(0, 3)
+  const box = (n: number, level: boolean) => <span className={`w-7 text-center font-extrabold text-navy-950 ${level ? 'bg-yellow' : 'bg-white'}`}>{n}</span>
   return (
     <div className="flex flex-col gap-5">
       <Action to="/vote">{mine === matchups.length && mine > 0 ? `Review your votes` : `Vote in ${stage.label}`}</Action>
@@ -73,6 +78,34 @@ function VotingLive({ bracket }: { bracket: Bracket }) {
         <Stat value={`${mine}/${matchups.length}`} label="Your votes" />
         {voters && <Stat value={`${voters.voters}/${voters.total}`} label="People voted" />}
       </div>
+      <Card
+        title="Latest scores"
+        aside={
+          <span className="flex items-center gap-1.5 text-[13px] font-extrabold">
+            <span className="h-2 w-2 rounded-full bg-ok" aria-hidden />
+            LIVE
+          </span>
+        }
+      >
+        <ol className="-m-4">
+          {latest.map((m) => {
+            const a = tallies[m.id]?.votes_a ?? 0
+            const b = tallies[m.id]?.votes_b ?? 0
+            return (
+              <li key={m.id} className="border-b border-line last:border-0">
+                <Link to="/vote" className="grid min-h-11 grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] items-center gap-2 px-3 text-[17px] font-bold hover:bg-navy-700">
+                  <span className="truncate text-right">{m.a?.name}</span>
+                  <span className="flex justify-center gap-0.5">
+                    {box(a, a === b && a > 0)}
+                    {box(b, a === b && a > 0)}
+                  </span>
+                  <span className="truncate">{m.b?.name}</span>
+                </Link>
+              </li>
+            )
+          })}
+        </ol>
+      </Card>
     </div>
   )
 }

@@ -6,7 +6,7 @@ export function Button({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'ghost' | 'danger' }) {
   const styles = {
-    primary: 'border-orange bg-orange font-display uppercase text-navy-950 hover:bg-yellow hover:border-yellow',
+    primary: 'border-orange bg-orange font-display font-extrabold italic uppercase text-navy-950 hover:bg-yellow hover:border-yellow',
     ghost: 'border-line bg-navy-800 font-bold uppercase tracking-wider text-white hover:border-orange',
     danger: 'border-danger/70 bg-navy-800 font-bold uppercase tracking-wider text-danger hover:border-danger',
   }[variant]
@@ -30,7 +30,7 @@ export function TextField({ label, ...props }: InputHTMLAttributes<HTMLInputElem
   )
 }
 
-/** Slanted broadcast caption, e.g. an eyebrow or section label. */
+/** Broadcast tab: straight-edged, italic caps (eyebrows, section labels, status tags). */
 export function Badge({
   children,
   tone = 'orange',
@@ -42,16 +42,16 @@ export function Badge({
 }) {
   const styles = { orange: 'bg-orange text-navy-950', yellow: 'bg-yellow text-navy-950', live: 'bg-live text-white' }[tone]
   return (
-    <span className={`slant inline-block px-3 py-0.5 text-sm font-extrabold uppercase tracking-[0.15em] ${styles} ${className}`}>
+    <span className={`slant inline-block px-2.5 py-0.5 text-[13px] font-extrabold uppercase tracking-[0.12em] ${styles} ${className}`}>
       {children}
     </span>
   )
 }
 
-/** A number on a dark dot-matrix LED inset. */
+/** A number on a dark inset, amber digits. */
 export function Led({ children, className = '' }: { children: ReactNode; className?: string }) {
   // inline-flex + centring so callers can size the box (h-11 w-11 …) and the digits stay centred.
-  return <span className={`led inline-flex items-center justify-center px-2 font-led text-amber ${className}`}>{children}</span>
+  return <span className={`led inline-flex items-center justify-center px-2 font-led font-extrabold text-amber ${className}`}>{children}</span>
 }
 
 /** Panel. With a title it gets the broadcast header strip. */
@@ -69,8 +69,8 @@ export function Card({
   return (
     <section className={`border border-line bg-navy-800 ${className}`}>
       {title && (
-        <header className="flex min-h-10 items-center justify-between gap-3 border-b-2 border-orange bg-navy-900 px-4 py-1.5">
-          <h2 className="text-base font-extrabold uppercase tracking-[0.15em]">{title}</h2>
+        <header className="flex min-h-10 items-center justify-between gap-3 bg-navy-700 px-3 py-1.5">
+          <h2 className="text-[17px] font-extrabold tracking-wide uppercase italic">{title}</h2>
           {aside}
         </header>
       )}
@@ -81,9 +81,12 @@ export function Card({
 
 export function PageTitle({ eyebrow, children }: { eyebrow?: string; children: ReactNode }) {
   return (
-    <header className="mb-5 flex flex-col items-start gap-1">
-      {eyebrow && <Badge className="ml-1">{eyebrow}</Badge>}
-      <h1 className="font-display text-3xl leading-tight uppercase">{children}</h1>
+    <header className="mb-5 flex flex-col items-start">
+      {eyebrow && <Badge>{eyebrow}</Badge>}
+      {/* White title plate with an angled right edge. */}
+      <div className="plate max-w-full bg-white py-1.5 pr-8 pl-3 text-navy-950">
+        <h1 className="font-display text-[30px] leading-[1.05] font-extrabold uppercase italic">{children}</h1>
+      </div>
     </header>
   )
 }
