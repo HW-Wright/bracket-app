@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
+import { useKeyboardAware } from '../lib/useKeyboardAware'
 
 const icons: Record<string, string> = {
   home: 'M4 11 12 4l8 7v9h-5v-6H9v6H4z',
@@ -31,6 +32,7 @@ function Tab({ to, label, icon }: { to: string; label: string; icon: string }) {
 
 export default function Layout() {
   const { profile } = useAuth()
+  useKeyboardAware()
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-10 border-b border-line bg-ink-950/95 px-4 pt-[env(safe-area-inset-top)] backdrop-blur">
@@ -41,7 +43,7 @@ export default function Layout() {
       </main>
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-10 border-t border-gold-700/60 bg-ink-900 pb-[env(safe-area-inset-bottom)]"
+        className="hide-with-keyboard fixed inset-x-0 bottom-0 z-10 border-t border-gold-700/60 bg-ink-900 pb-[env(safe-area-inset-bottom)]"
       >
         <div className="mx-auto flex max-w-xl">
           <Tab to="/" label="Home" icon="home" />

@@ -31,6 +31,8 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always, everyone's once phase is past `nominations`. Blind applies to the admin too.
 - `normaliseEntry()` / `entryKey()` in `src/lib/normalise.ts`: comparison forms (key = normalised with spaces removed). Phase 4 needs a SQL twin.
 - Harry's decision: exact `entryKey` matches auto-combine at close (splittable); fuzzy matches are suggestions only. See SPEC §5.2.
+- A list counts only when complete: exactly 15, no repeated `entry_key` (`nomination_list_status()`, mirrored by `listStatus()` in TS). Incomplete lists are kept but excluded from seeding.
+- SQL `normalise_entry()` / `entry_key()` mirror the TS versions; `complete_lists.test.sql` checks parity cases.
 - `abandon_bracket()` deletes a pre-live bracket: every table referencing `brackets` must `on delete cascade`.
 
 ## Conventions

@@ -13,8 +13,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useState, type FormEvent } from 'react'
 import { rpcMessage } from '../../bracket/BracketProvider'
 import { Button, ErrorText } from '../../components/ui'
-import { findOwnDuplicates, MAX_NOMINATIONS, moveItem } from '../../lib/normalise'
+import { listStatus, MAX_NOMINATIONS, moveItem } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
+import { revealFocusedField } from '../../lib/useKeyboardAware'
 
 interface Item {
   key: string
@@ -118,9 +119,12 @@ export default function NominationEditor({
 
   const texts = items.map((i) => i.text.trim())
   const dirty = texts.length !== saved.length || texts.some((t, i) => t !== saved[i])
-  const duplicates = findOwnDuplicates(texts)
+  const current = listStatus(texts)
+  const savedComplete = listStatus(saved).complete
+  const duplicates = current.repeats
   const dupIndexes = new Set(duplicates.flat())
   const full = items.length >= MAX_NOMINATIONS
+  const missing = MAX_NOMINATIONS - current.count
 
   useEffect(() => {
     if (!dirty) return
@@ -152,6 +156,8 @@ export default function NominationEditor({
     if (!text || full) return
     edit([...items, ...toItems([text])])
     setDraft('')
+    // The add field moves down a row; keep it above the keyboard.
+    requestAnimationFrame(() => requestAnimationFrame(revealFocusedField))
   }
 
   async function save() {
@@ -172,9 +178,25 @@ export default function NominationEditor({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-ivory-muted">
-        Rank up to {MAX_NOMINATIONS}, favourite first. #1 is worth 15 points, #15 is worth 1. Nobody sees your list until
-        Harry closes nominations.
+        Rank exactly {MAX_NOMINATIONS}, favourite first. #1 is worth 15 points, #15 is worth 1. Nobody sees your list
+        until Harry closes nominations. Save a draft any time; only complete lists of {MAX_NOMINATIONS} count.
       </p>
+
+      <div
+        role="status"
+        className={`rounded-sm border px-3 py-2 text-sm ${
+          savedComplete && !dirty ? 'border-gold-700 text-gold-300' : 'border-line text-ivory-muted'
+        }`}
+      >
+        {savedComplete && !dirty
+          ? `Submitted ✓ Your ${MAX_NOMINATIONS} count. You can still edit until Harry closes nominations.`
+          : current.complete
+            ? `${MAX_NOMINATIONS} of ${MAX_NOMINATIONS}. Save to submit.`
+            : missing > 0
+              ? `Draft · ${current.count} of ${MAX_NOMINATIONS}. Add ${missing} more to submit.`
+              : 'Draft: fix the repeat below to submit.'}
+        {savedComplete && dirty && !current.complete && ' Saving this would un-submit your list.'}
+      </div>
 
       {items.length > 0 && (
         <DndContext
@@ -203,14 +225,17 @@ export default function NominationEditor({
       )}
 
       {duplicates.length > 0 && (
-        <p role="status" className="rounded-sm border border-gold-700 bg-ink-800 p-3 text-sm text-ivory">
-          {duplicates.map((g) => g.map((i) => `#${i + 1}`).join(' and ')).join('; ')} look like the same thing. You can keep
-          both, but they'd likely be merged and only your best rank would count.
+        <p role="alert" className="rounded-sm border border-danger/60 bg-ink-800 p-3 text-sm text-ivory">
+          {duplicates.map((g) => g.map((i) => `#${i + 1}`).join(' and ')).join('; ')}{' '}
+          {duplicates.length === 1 && duplicates[0].length === 2 ? 'are' : 'are each'} the same entry spelled differently.
+          Replace the repeat to complete your list.
         </p>
       )}
 
       {full ? (
-        <p className="label-caps text-center">List full: {MAX_NOMINATIONS} of {MAX_NOMINATIONS}</p>
+        <p className="label-caps text-center">
+          {MAX_NOMINATIONS} of {MAX_NOMINATIONS}: remove one to add another
+        </p>
       ) : (
         <form onSubmit={add} className="flex gap-2">
           <input
@@ -229,9 +254,15 @@ export default function NominationEditor({
 
       <ErrorText>{error}</ErrorText>
 
-      <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-ink-950/95 py-3 backdrop-blur">
+      <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-ink-950/95 py-3 backdrop-blur">
         <Button onClick={save} disabled={!dirty || status === 'saving'} className="flex-1">
-          {status === 'saving' ? 'Saving…' : dirty ? 'Save nominations' : 'Saved'}
+          {status === 'saving'
+            ? 'Saving…'
+            : !dirty
+              ? 'Saved'
+              : current.complete
+                ? 'Save and submit'
+                : `Save draft (${current.count}/${MAX_NOMINATIONS})`}
         </Button>
         {status === 'saved' && !dirty && (
           <span role="status" className="text-sm text-ok">

@@ -3,6 +3,7 @@ import { useAuth } from '../../auth/AuthProvider'
 import { useBracket } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
 import { Card, PageTitle } from '../../components/ui'
+import { listStatus, MAX_NOMINATIONS } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
 import NominationEditor from './NominationEditor'
 
@@ -40,9 +41,13 @@ function AllNominations({ rows }: { rows: NominationRow[] }) {
         <div className="flex flex-col gap-3">
           {groups.map((g) => (
             <details key={g.name} className="group rounded-sm border border-line bg-ink-900" open>
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-4">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4">
                 <span>{g.name}</span>
-                <span className="label-caps">{g.items.length} picks</span>
+                {listStatus(g.items.map((n) => n.text)).complete ? (
+                  <span className="label-caps">{g.items.length} picks</span>
+                ) : (
+                  <span className="label-caps text-danger">Incomplete · not counted</span>
+                )}
               </summary>
               <ol className="border-t border-line px-4 py-2">
                 {g.items.map((n) => (
@@ -122,6 +127,12 @@ export default function Nominate() {
       <PageTitle eyebrow="Nominations closed">{bracket.title}</PageTitle>
       <Card>
         <h2 className="label-caps mb-3">Your picks</h2>
+        {mine.length > 0 && !listStatus(mine.map((n) => n.text)).complete && (
+          <p className="mb-3 text-sm text-danger">
+            Your list wasn't complete ({MAX_NOMINATIONS} entries, no repeats) when nominations closed, so it doesn't count
+            towards this bracket.
+          </p>
+        )}
         {mine.length === 0 ? (
           <p className="text-sm text-ivory-muted">You didn't nominate anything this time.</p>
         ) : (

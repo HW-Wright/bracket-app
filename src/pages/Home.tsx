@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracket, type Bracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
 import { Card, PageTitle } from '../components/ui'
+import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
+import { supabase } from '../lib/supabase'
 
 function Action({ to, children }: { to: string; children: string }) {
   return (
@@ -17,9 +20,27 @@ function Action({ to, children }: { to: string; children: string }) {
 
 function NominationsOpen({ bracket }: { bracket: Bracket }) {
   const { progress } = useProgress(bracket.id)
+  const [mine, setMine] = useState<ListStatus | null>(null)
+
+  useEffect(() => {
+    // RLS: while open this returns only the caller's own rows.
+    supabase
+      .from('nominations')
+      .select('text')
+      .eq('bracket_id', bracket.id)
+      .then(({ data }) => setMine(listStatus((data ?? []).map((r) => r.text))))
+  }, [bracket.id])
+
+  const label = !mine || mine.count === 0
+    ? 'Submit your nominations'
+    : mine.complete
+      ? 'Review your nominations'
+      : `Finish your nominations (${mine.count}/${MAX_NOMINATIONS})`
+
   return (
     <div className="flex flex-col gap-4">
-      <Action to="/nominate">Submit your nominations</Action>
+      {mine?.complete && <p className="label-caps text-center text-gold-500">You've submitted ✓</p>}
+      <Action to="/nominate">{label}</Action>
       {progress && (
         <p className="label-caps text-center" role="status">
           {progress.submitted} of {progress.total} have submitted

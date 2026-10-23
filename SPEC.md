@@ -62,12 +62,12 @@ The home screen is phase-aware and always shows the single most relevant action 
 
 ## 4. Nominations
 
-- **Each user may submit up to 15 nominations, ranked 1 (favourite) to 15.** Fewer than 15 is allowed.
+- **Each user must submit exactly 15 nominations, ranked 1 (favourite) to 15** (decided by Harry, 2026-10-23). Drafts of any length can be saved, but a list only counts as submitted when it has 15 entries and no exact repeats (same normalised text). Lists still incomplete when nominations close are excluded from seeding and shown as "not counted".
 - Users can save, edit, reorder and delete their list freely until Harry closes nominations.
 - Reordering must be easy on a phone: drag handles **and** up/down buttons.
-- Warn (do not block silently) if a user enters something that normalises to the same text as another of their own entries.
+- Flag clearly if a user enters something that normalises to the same text as another of their own entries; an exact repeat blocks the list from counting as complete.
 - **Blind until close:** a user can only see their own nominations while nominations are open. **Enforce this with RLS**, not just the UI.
-- While open, everyone can see a progress count only, e.g. "5 of 8 have submitted" (no content, no names).
+- While open, everyone can see a progress count only, e.g. "5 of 8 have submitted" (no content, no names). **Harry's admin panel also shows each person's status** (e.g. "Joe 15/15 ✓", "Sean 9/15"), never the content. The close confirmation names anyone incomplete.
 - **After close:** everyone can see all nominations, grouped by user with ranks, in a section at the bottom of the nominations page.
 
 ---
@@ -251,6 +251,7 @@ Write a `README.md` with:
 - Stage sections release in fixed order (Quarter A to D, then top and bottom halves).
 - A third-place playoff decides the podium's third place.
 - After nominations close, everyone sees all nominations grouped by user with ranks.
+- 15 nominations are required; incomplete lists at close are excluded (Harry may reopen to let people finish).
 - Seeding tiebreak order is points, then distinct nominators, then the stored random value.
 - Exact normalised matches auto-combine at close (splittable); fuzzy matches need Harry's confirmation.
 - Harry can abandon (delete) any bracket that has not gone live, with a typed confirmation.

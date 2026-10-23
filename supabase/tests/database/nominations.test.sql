@@ -79,8 +79,8 @@ select is(
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c3');
 select results_eq(
   format($$select submitted, total from public.nomination_progress(%L)$$, (select id from b)),
-  $$values (2, 3)$$,
-  'progress shows 2 of 3 submitted');
+  $$values (0, 3)$$,
+  'progress counts complete (15-entry) lists only: 0 of 3');
 
 -- Re-saving replaces the list
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b2');

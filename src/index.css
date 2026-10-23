@@ -42,3 +42,17 @@
   border-top: 1px solid var(--color-gold-700);
   border-bottom: 1px solid var(--color-gold-700);
 }
+
+/* Room for the sticky header / bottom bars when the browser scrolls a focused field into view. */
+html {
+  scroll-padding-top: 4.5rem;
+  scroll-padding-bottom: 9rem;
+}
+
+/* While the on-screen keyboard is up (see useKeyboardAware), get bottom chrome out of the way. */
+html[data-keyboard] .hide-with-keyboard {
+  display: none;
+}
+html[data-keyboard] .unstick-with-keyboard {
+  position: static;
+}

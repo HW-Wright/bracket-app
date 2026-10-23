@@ -43,3 +43,16 @@ export function moveItem<T>(items: T[], from: number, to: number): T[] {
 }
 
 export const MAX_NOMINATIONS = 15
+
+export interface ListStatus {
+  count: number
+  repeats: number[][]
+  complete: boolean
+}
+
+/** A list counts only with exactly 15 non-blank entries and no exact repeats (mirrors nomination_list_status). */
+export function listStatus(items: string[]): ListStatus {
+  const filled = items.map((t) => t.trim()).filter(Boolean)
+  const repeats = findOwnDuplicates(filled)
+  return { count: filled.length, repeats, complete: filled.length === MAX_NOMINATIONS && repeats.length === 0 }
+}

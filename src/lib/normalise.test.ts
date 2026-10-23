@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { entryKey, findOwnDuplicates, moveItem, normaliseEntry } from './normalise'
+import { entryKey, findOwnDuplicates, listStatus, moveItem, normaliseEntry } from './normalise'
 
 describe('normaliseEntry', () => {
   it.each([
@@ -58,5 +58,19 @@ describe('moveItem', () => {
     const items = ['a', 'b']
     expect(moveItem(items, 0, -1)).toBe(items)
     expect(moveItem(items, 1, 2)).toBe(items)
+  })
+})
+
+describe('listStatus', () => {
+  const fifteen = Array.from({ length: 15 }, (_, i) => `Film ${i + 1}`)
+  it('is complete with 15 distinct entries', () => {
+    expect(listStatus(fifteen)).toEqual({ count: 15, repeats: [], complete: true })
+  })
+  it('is incomplete below 15, ignoring blanks', () => {
+    expect(listStatus([...fifteen.slice(0, 9), ' ', ''])).toMatchObject({ count: 9, complete: false })
+  })
+  it('is incomplete with an exact repeat', () => {
+    const list = [...fifteen.slice(0, 14), 'film-1']
+    expect(listStatus(list)).toMatchObject({ count: 15, repeats: [[0, 14]], complete: false })
   })
 })
