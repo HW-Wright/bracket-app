@@ -164,6 +164,15 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 ### 9.1 Stats page (added by Harry, 2026-10-23)
 - **Total votes (rolling):** every entry's cumulative votes across all stages so far, including live tallies in the open stage, with win–loss record and seed. Sorted by votes, then seed.
 - **Upsets:** every decided matchup where the lower seed (higher number) beat the higher seed, biggest seed gap first, showing seeds, score, round and any coin-toss or admin badge.
+- **Cinderella run:** the lowest seed playing in each round, and how far the #64 seed got. A "Cinderella watch" line (lowest seed still alive) also shows on Home while voting is live.
+- **Houdini:** wins by a single vote plus coin tosses survived, per entry.
+- **Taste twins:** an 8x8 grid of how often each pair voted the same way in games both voted in; most aligned and most opposed pairs highlighted (pairs need 3+ shared games).
+- **Sheep:** how often each person voted with the majority (games with a clear majority).
+- **Lone wolf:** times someone was the only vote an entry got.
+- **Kingmaker:** times someone's vote decided a game won by one vote (every winning voter in such a game counts).
+- **Consensus vs chaos:** seeded entries with 2+ nominators vs one-person picks vs manual fill-ins: count, still alive, average round reached, best run.
+- **Bracket summary:** total votes, games decided, unanimous results (2+ votes, all for the winner), coin tosses, upsets, admin decisions. Also shown on each archived bracket.
+- Voter-based stats use closed stages only (open-stage votes stay hidden). Each stat is its own titled panel, with a sticky jump menu at the top of the page. Added by Harry, 2026-10-23.
 - Lives on its own bottom-nav tab. Profile moves to an avatar button in the header to make room.
 
 ### 9.2 Home: your picks still alive

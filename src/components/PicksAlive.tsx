@@ -3,9 +3,9 @@ import { Link } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracketData } from '../bracket/useBracketData'
 import { ROUNDS } from '../lib/bracket'
-import { isAlive, pickStatus, type PickStatus } from '../lib/stats'
+import { cinderellaWatch, isAlive, pickStatus, type PickStatus } from '../lib/stats'
 import { supabase } from '../lib/supabase'
-import { Card, Led } from './ui'
+import { Badge, Card, Led } from './ui'
 
 interface Pick {
   entryId: string
@@ -62,11 +62,24 @@ export default function PicksAlive({ bracketId }: { bracketId: string }) {
   }, [bracketId, profile])
 
   if (!data || !picks) return null
+  const cinderella = data.bracket.phase === 'live' ? cinderellaWatch(data.matchups) : null
+  const watch = cinderella && (
+    <Link to={`/entry/${cinderella.id}`} className="mb-4 flex min-h-12 items-center gap-3 border border-line bg-navy-800 pr-3 hover:border-orange">
+      <Badge tone="yellow" className="ml-2 shrink-0">
+        Cinderella watch
+      </Badge>
+      <span className="min-w-0 flex-1 truncate text-lg font-semibold">{cinderella.name}</span>
+      <Led className="py-0.5">#{cinderella.seed}</Led>
+    </Link>
+  )
   if (picks.length === 0) {
     return (
+      <>
+      {watch}
       <Card title="Your picks">
         <p className="text-base text-muted">Your list wasn't complete when nominations closed, so none of your picks are in this one.</p>
       </Card>
+      </>
     )
   }
 
@@ -77,6 +90,8 @@ export default function PicksAlive({ bracketId }: { bracketId: string }) {
   const shown = all ? rows : rows.slice(0, 5)
 
   return (
+    <>
+    {watch}
     <Card title="Your picks still alive" aside={<Led className="py-0.5 text-xl">{`${alive}/${rows.length}`}</Led>}>
       <ol className="-m-4">
         {shown.map((r) => {
@@ -99,5 +114,6 @@ export default function PicksAlive({ bracketId }: { bracketId: string }) {
         </button>
       )}
     </Card>
+    </>
   )
 }

@@ -16,7 +16,7 @@ function Action({ to, children }: { to: string; children: string }) {
       to={to}
       className="mx-1.5 flex min-h-14 -skew-x-8 items-center justify-center bg-white px-4 text-center font-display text-xl text-navy-950 uppercase shadow-[5px_5px_0_var(--color-orange)] hover:bg-yellow"
     >
-      {children} ▸
+      {children} ▸
     </Link>
   )
 }

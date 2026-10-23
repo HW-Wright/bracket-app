@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { useBracketData } from '../../bracket/useBracketData'
 import { Card, PageTitle } from '../../components/ui'
+import { SummaryStats } from '../Stats'
 import { supabase } from '../../lib/supabase'
 import BracketView from '../bracket/BracketView'
 import { AllNominations, type NominationRow } from '../nominate/Nominate'
@@ -30,6 +31,9 @@ export default function ArchivedBracket() {
       {data ? (
         <>
           <PageTitle eyebrow="Archived">{data.bracket.title}</PageTitle>
+          <Card title="Bracket summary" className="mb-6">
+            <SummaryStats data={data} />
+          </Card>
           <BracketView data={data} />
           {rows && <AllNominations rows={rows} />}
         </>
