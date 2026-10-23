@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router'
 import { useAuth } from '../../auth/AuthProvider'
 import { PageTitle } from '../../components/ui'
+import AdminBracket from './AdminBracket'
 import AdminUsers from './AdminUsers'
 
 export default function Admin() {
@@ -9,7 +10,10 @@ export default function Admin() {
   return (
     <>
       <PageTitle eyebrow="Harry only">Admin</PageTitle>
-      <AdminUsers />
+      <div className="flex flex-col gap-6">
+        <AdminBracket />
+        <AdminUsers />
+      </div>
     </>
   )
 }

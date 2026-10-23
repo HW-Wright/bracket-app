@@ -25,6 +25,12 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Deactivation = `active=false` + an auth ban.
 - Function EXECUTE is opt-in: default privileges are revoked, so every new function needs an explicit `grant execute ... to authenticated` (or anon).
 
+## Brackets & nominations
+- One active bracket (`archived_at is null`, enforced by a unique index). Phases: draft -> nominations -> review -> live -> complete.
+- Phase moves via admin RPCs (`create_bracket`, `set_bracket_phase`, ...); `require_admin()` guards them.
+- Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always, everyone's once phase is past `nominations`. Blind applies to the admin too.
+- `normaliseEntry()` in `src/lib/normalise.ts` is the canonical comparison form (Phase 4 adds a SQL twin).
+
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
 - RLS on every table. Privacy rules (blind nominations, hidden voters) are enforced in the DB, not just the UI.
@@ -34,4 +40,4 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Design: dark art deco, black + restrained muted gold. No Batman/DC references of any kind.
 
 ## Status
-Phase 1 done. Phase 2 (auth & users) in progress: built and deployed; live users not yet seeded.
+Phases 1–2 done. Phase 3 (brackets & nominations) built + deployed, awaiting Harry's phone test. Next: Phase 4 (review & seeding).
