@@ -49,6 +49,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - `matchup_tallies` (trigger-maintained, one row per matchup) is what clients read and subscribe to for live counts. `stages` and `brackets` are also in the Realtime publication.
 - `close_stage_and_advance()`: one transaction; ties use stored `coin_toss_winner` if still valid else `random()` (then stored). `feed_forward()` fills the next round / third place. `stage_advances` is the undo stack for `undo_last_advance()` (typed UNDO). `override_matchup()` (typed OVERRIDE) only while the next matchup is undecided.
 - `npm run test:realtime`: Realtime integration test (local).
+- `npm run test-bracket -- create|delete [--local]`: throwaway "Test – ignore" bracket in review with 64 dummy entries (refuses if a real bracket is active).
 - FKs into `entries` cascade/set null so deleting a bracket removes everything.
 
 ## Conventions

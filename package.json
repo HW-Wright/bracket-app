@@ -16,7 +16,8 @@
     "test:db": "supabase test db",
     "test:auth": "node scripts/test-auth-local.ts",
     "test:storage": "node scripts/test-storage-local.ts",
-    "test:realtime": "node scripts/test-realtime-local.ts"
+    "test:realtime": "node scripts/test-realtime-local.ts",
+    "test-bracket": "node --env-file=.env scripts/test-bracket.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
