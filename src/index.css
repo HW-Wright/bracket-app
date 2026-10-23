@@ -63,6 +63,11 @@ html[data-keyboard] .unstick-with-keyboard {
   position: static;
 }
 
+/* Keep the bottom nav on the visible bottom edge even if iOS's layout viewport drifts (see useKeyboardAware). */
+.pin-to-visible-bottom {
+  transform: translateY(var(--vv-shift, 0px));
+}
+
 /* Champion title card entrance (only under motion-safe). */
 @keyframes champ {
   from {

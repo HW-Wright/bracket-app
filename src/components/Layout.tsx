@@ -103,7 +103,7 @@ export default function Layout() {
       </main>
       <nav
         aria-label="Main"
-        className="hide-with-keyboard fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-orange bg-navy-800 pb-[env(safe-area-inset-bottom)]"
+        className="hide-with-keyboard pin-to-visible-bottom fixed inset-x-0 bottom-0 z-10 border-t-[3px] border-orange bg-navy-800 pb-[env(safe-area-inset-bottom)]"
       >
         <div className="mx-auto flex max-w-xl">
           <Tab to="/" label="Home" icon="home" />
