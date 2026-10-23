@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 import { rpcMessage, useBracket, type Bracket, type BracketPhase } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
 import { Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
@@ -219,17 +220,28 @@ export default function AdminBracket() {
                 let them finish.
               </p>
             )}
-            <p className="text-base text-muted">Review, merging and seeding arrive in the next build phase.</p>
+            <Link
+              to="/admin/review"
+              className="flex min-h-14 -skew-x-8 items-center justify-center bg-white px-4 font-display text-xl text-navy-950 uppercase shadow-[5px_5px_0_var(--color-orange)] hover:bg-yellow"
+            >
+              Review &amp; seeding ▸
+            </Link>
             <Button
               variant="ghost"
               disabled={busy}
               onClick={() =>
-                setPhase('nominations', 'Reopen nominations? Everyone can edit their lists again, and lists go back to private until you close again.')
+                setPhase('nominations', 'Reopen nominations? Everyone can edit their lists again, lists go back to private, and ALL review work (merges, manual entries, removals, images) is discarded. Closing again rebuilds entries from scratch.')
               }
             >
               Reopen nominations
             </Button>
           </>
+        )}
+
+        {bracket.phase === 'live' && (
+          <Link to="/admin/review" className="flex min-h-11 items-center text-base font-bold text-orange uppercase">
+            Seeds &amp; entry images →
+          </Link>
         )}
 
         {(bracket.phase === 'nominations' || bracket.phase === 'review') && (

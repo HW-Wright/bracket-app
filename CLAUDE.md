@@ -35,6 +35,15 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - SQL `normalise_entry()` / `entry_key()` mirror the TS versions; `complete_lists.test.sql` checks parity cases.
 - `abandon_bracket()` deletes a pre-live bracket: every table referencing `brackets` must `on delete cascade`.
 
+## Review, seeding & bracket structure
+- Closing nominations runs `build_entries()`: one `entries` row per `entry_key` from complete lists; each counted nomination's `entry_id` = the entry it ORIGINALLY landed in. Reopening deletes entries.
+- Merge = `entries.merged_into` (target = earlier-created entry, so it keeps its tiebreak). Scores are always computed by `entry_standings()` over the merge tree with the best-rank-per-user rule, so unmerge is just clearing `merged_into`. `split_entry()` undoes an auto-combine by spelling.
+- Order: points desc, nominators desc, stored `tiebreak` asc. `tiebreak` is set once at insert and never rewritten.
+- `lock_seeding()` sets seeds 1-64, creates `stages` (10) and all `matchups` (round 1-6; round 6 slot 1 = third place; round r slot s fed by r-1 slots 2s/2s+1), opens stage 1, phase -> live.
+- `bracket_order()` / `stage_for()` in SQL mirror `src/lib/bracket.ts`; seeding.test.sql checks parity.
+- Entry images: public bucket `entry-images`, admin-only writes (storage policies). Client resizes in `src/lib/image.ts`.
+- `npm run test:storage`: storage policy integration test (local).
+
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
 - RLS on every table. Privacy rules (blind nominations, hidden voters) are enforced in the DB, not just the UI.
@@ -44,4 +53,4 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Design: direction D "Broadcast Scoreboard" (SPEC §13): navy + court orange broadcast graphics, slanted `Badge`s, amber LED numbers via `Led` (`font-led`). Tokens in `src/index.css`; shared pieces in `src/components/ui.tsx`. Every matchup goes in a "GAME n" box. No NCAA trademarks.
 
 ## Status
-Phases 1–2 done. Phase 3 (brackets & nominations) built + deployed, awaiting Harry's phone test. Next: Phase 4 (review & seeding).
+Phases 1–3 done, design direction D applied. Phase 4 (review & seeding) built; next Phase 5 (voting & advancement).

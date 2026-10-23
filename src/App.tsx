@@ -11,6 +11,7 @@ import Profile from './pages/Profile'
 
 const Admin = lazy(() => import('./pages/admin/Admin'))
 const Nominate = lazy(() => import('./pages/nominate/Nominate'))
+const AdminReview = lazy(() => import('./pages/admin/review/AdminReview'))
 
 function Splash() {
   return <div className="min-h-dvh" aria-busy="true" />
@@ -36,6 +37,7 @@ function Gate() {
             <Route path="archive" element={<Placeholder title="Archive" note="No past brackets yet." />} />
             <Route path="profile" element={<Profile />} />
             <Route path="admin" element={<Admin />} />
+            <Route path="admin/review" element={<AdminReview />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
