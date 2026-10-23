@@ -142,7 +142,7 @@ export default function BracketView({ data }: { data: BracketData }) {
   const roundsWithGames = ROUNDS.filter((r) => data.matchups.some((m) => m.round === r.round && (m.a || m.b)))
   const openRound = data.stages.find((s) => s.number === data.openStage)?.round
   const [round, setRound] = useState<number>(openRound ?? roundsWithGames.at(-1)?.round ?? 1)
-  const [view, setView] = useState<'list' | 'tree'>('list')
+  const [view, setView] = useState<'list' | 'tree'>('tree')
 
   if (data.matchups.length === 0) {
     return (
@@ -160,7 +160,7 @@ export default function BracketView({ data }: { data: BracketData }) {
       {data.bracket.phase === 'complete' && <ChampionCard data={data} />}
 
       <div className="mb-3 flex gap-2">
-        {(['list', 'tree'] as const).map((v) => (
+        {(['tree', 'list'] as const).map((v) => (
           <button
             key={v}
             type="button"

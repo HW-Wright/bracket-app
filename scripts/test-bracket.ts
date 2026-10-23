@@ -1,4 +1,4 @@
-// Creates (or deletes) a throwaway "Test – ignore" bracket in REVIEW with 64 dummy entries, so voting can be
+// Creates (or deletes) a throwaway "Test" bracket in REVIEW with 64 dummy entries, so voting can be
 // tried on phones without collecting 64 real nominations. Never touches any other bracket.
 //
 //   npm run test-bracket -- create [--local]
@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process'
 import { createClient } from '@supabase/supabase-js'
 import { getTarget } from './target.ts'
 
-const TITLE = 'Test – ignore'
+const TITLE = 'Test'
 const VILLAINS = [
   'Darth Vader', 'Hannibal Lecter', 'The Joker', 'Hans Gruber', 'Nurse Ratched', 'Annie Wilkes', 'Pennywise', 'Norman Bates',
   'Anton Chigurh', 'Patrick Bateman', 'Bane', 'Thanos', 'Voldemort', 'Sauron', 'Agent Smith', 'The Terminator',

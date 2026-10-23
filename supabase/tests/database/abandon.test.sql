@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(6);
+select plan(7);
 
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'harry@test.invalid', 'authenticated', 'authenticated'),
@@ -24,9 +24,11 @@ select throws_ok($$select public.abandon_bracket('00000000-0000-0000-0000-000000
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
 select throws_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb01', 'test')$$,
-  'P0001', 'Type the bracket title exactly to confirm', 'wrong confirmation is refused');
-select lives_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb01', '  test – IGNORE ')$$,
-  'admin abandons with matching title (case-insensitive)');
+  'P0001', 'Type the bracket title to confirm', 'wrong confirmation is refused');
+select throws_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb01', ' - ')$$,
+  'P0001', 'Type the bracket title to confirm', 'punctuation-only confirmation is refused');
+select lives_ok($$select public.abandon_bracket('00000000-0000-0000-0000-00000000bb01', '  test - IGNORE ')$$,
+  'admin abandons with a plain hyphen for the en dash, any case');
 
 reset role;
 select is((select count(*)::int from public.brackets), 0, 'bracket deleted');

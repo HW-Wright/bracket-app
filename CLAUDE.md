@@ -50,7 +50,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Stages: one per round (6). Advance/undo look up whether a next stage exists rather than assuming a count.
 - `close_stage_and_advance()`: one transaction; ties use stored `coin_toss_winner` if still valid else `random()` (then stored). `feed_forward()` fills the next round / third place. `stage_advances` is the undo stack for `undo_last_advance()` (typed UNDO). `override_matchup()` (typed OVERRIDE) only while the next matchup is undecided.
 - `npm run test:realtime`: Realtime integration test (local).
-- `npm run test-bracket -- create|delete [--local]`: throwaway "Test – ignore" bracket in review with 64 dummy entries (refuses if a real bracket is active).
+- `npm run test-bracket -- create|delete [--local]`: throwaway "Test" bracket in review with 64 dummy entries (refuses if a real bracket is active).
 - FKs into `entries` cascade/set null so deleting a bracket removes everything.
 
 ## History, stats, archive (Phase 6)
