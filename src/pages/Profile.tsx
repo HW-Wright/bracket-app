@@ -11,16 +11,15 @@ export default function Profile() {
     <>
       <PageTitle eyebrow={`@${profile?.username}`}>{profile?.display_name}</PageTitle>
       <div className="flex flex-col gap-4">
-        <Card>
-          <h2 className="label-caps mb-4">Change password</h2>
+        <Card title="Change password">
           <ChangePasswordForm onDone={() => setSaved(true)} />
           {saved && (
-            <p role="status" className="mt-3 text-sm text-ok">
+            <p role="status" className="mt-3 text-base font-semibold text-ok">
               Password updated.
             </p>
           )}
         </Card>
-        <Link to="/archive" className="text-sm text-gold-500 underline-offset-4 hover:underline">
+        <Link to="/archive" className="flex min-h-11 items-center text-base font-bold text-orange uppercase underline-offset-4 hover:underline">
           Past brackets →
         </Link>
         <Button variant="ghost" onClick={signOut}>

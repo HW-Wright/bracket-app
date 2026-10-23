@@ -12,7 +12,7 @@ import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalList
 import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useState, type FormEvent } from 'react'
 import { rpcMessage } from '../../bracket/BracketProvider'
-import { Button, ErrorText } from '../../components/ui'
+import { Button, ErrorText, Led } from '../../components/ui'
 import { listStatus, MAX_NOMINATIONS, moveItem } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
 import { revealFocusedField } from '../../lib/useKeyboardAware'
@@ -32,9 +32,9 @@ function IconButton({ label, onClick, disabled, children }: { label: string; onC
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm text-ivory-muted hover:text-gold-500 disabled:opacity-25"
+      className="flex h-11 w-11 shrink-0 items-center justify-center text-muted hover:text-orange disabled:opacity-25"
     >
-      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
         <path d={children} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
@@ -65,15 +65,15 @@ function Row({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`flex items-center gap-1 rounded-sm border bg-ink-900 pr-1 ${
-        isDragging ? 'z-10 border-gold-500 shadow-lg shadow-black' : duplicate ? 'border-danger' : 'border-line'
+      className={`flex items-center gap-1 border bg-navy-800 pr-1 ${
+        isDragging ? 'z-10 border-orange shadow-lg shadow-black' : duplicate ? 'border-danger' : 'border-line'
       }`}
     >
       <button
         type="button"
         ref={setActivatorNodeRef}
         aria-label={`Drag to reorder ${item.text || 'nomination'}`}
-        className="flex h-11 w-9 shrink-0 cursor-grab touch-none items-center justify-center text-ivory-muted active:cursor-grabbing"
+        className="flex h-11 w-9 shrink-0 cursor-grab touch-none items-center justify-center text-muted active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
@@ -81,13 +81,13 @@ function Row({
           {[3, 10, 17].flatMap((y) => [<circle key={`a${y}`} cx="3" cy={y} r="1.5" />, <circle key={`b${y}`} cx="9" cy={y} r="1.5" />])}
         </svg>
       </button>
-      <span className="w-6 shrink-0 text-right font-display text-gold-500">{index + 1}</span>
+      <Led className="flex h-11 w-10 shrink-0 items-center justify-center text-lg">{index + 1}</Led>
       <input
         value={item.text}
         onChange={(e) => onChange(e.target.value)}
         maxLength={120}
         aria-label={`Nomination ${index + 1}`}
-        className="min-h-11 min-w-0 flex-1 bg-transparent px-2 text-base text-ivory outline-none focus:bg-ink-800"
+        className="min-h-11 min-w-0 flex-1 bg-transparent px-2 text-lg font-semibold text-white outline-none focus:bg-navy-900"
       />
       <IconButton label="Move up" onClick={() => onMove(index - 1)} disabled={index === 0}>
         M6 15l6-6 6 6
@@ -177,15 +177,15 @@ export default function NominationEditor({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-ivory-muted">
+      <p className="text-base text-muted">
         Rank exactly {MAX_NOMINATIONS}, favourite first. #1 is worth 15 points, #15 is worth 1. Nobody sees your list
         until Harry closes nominations. Save a draft any time; only complete lists of {MAX_NOMINATIONS} count.
       </p>
 
       <div
         role="status"
-        className={`rounded-sm border px-3 py-2 text-sm ${
-          savedComplete && !dirty ? 'border-gold-700 text-gold-300' : 'border-line text-ivory-muted'
+        className={`border-2 px-3 py-2 text-base font-semibold ${
+          savedComplete && !dirty ? 'border-orange bg-navy-800 text-white' : 'border-line text-muted'
         }`}
       >
         {savedComplete && !dirty
@@ -225,7 +225,7 @@ export default function NominationEditor({
       )}
 
       {duplicates.length > 0 && (
-        <p role="alert" className="rounded-sm border border-danger/60 bg-ink-800 p-3 text-sm text-ivory">
+        <p role="alert" className="border-2 border-danger bg-navy-900 p-3 text-base text-white">
           {duplicates.map((g) => g.map((i) => `#${i + 1}`).join(' and ')).join('; ')}{' '}
           {duplicates.length === 1 && duplicates[0].length === 2 ? 'are' : 'are each'} the same entry spelled differently.
           Replace the repeat to complete your list.
@@ -244,7 +244,7 @@ export default function NominationEditor({
             maxLength={120}
             placeholder={`Add #${items.length + 1}`}
             aria-label="New nomination"
-            className="min-h-11 min-w-0 flex-1 rounded-sm border border-line bg-ink-900 px-3 text-base text-ivory outline-none placeholder:text-ivory-muted/70 focus:border-gold-500"
+            className="min-h-11 min-w-0 flex-1 border-2 border-line bg-navy-800 px-3 text-lg text-white outline-none placeholder:text-muted/80 focus:border-orange"
           />
           <Button type="submit" variant="ghost" disabled={!draft.trim()}>
             Add
@@ -254,7 +254,7 @@ export default function NominationEditor({
 
       <ErrorText>{error}</ErrorText>
 
-      <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-ink-950/95 py-3 backdrop-blur">
+      <div className="unstick-with-keyboard sticky bottom-[calc(3.5rem+env(safe-area-inset-bottom))] flex items-center gap-3 border-t border-line bg-navy-950/95 py-3 backdrop-blur">
         <Button onClick={save} disabled={!dirty || status === 'saving'} className="flex-1">
           {status === 'saving'
             ? 'Saving…'
@@ -265,7 +265,7 @@ export default function NominationEditor({
                 : `Save draft (${current.count}/${MAX_NOMINATIONS})`}
         </Button>
         {status === 'saved' && !dirty && (
-          <span role="status" className="text-sm text-ok">
+          <span role="status" className="text-base font-bold text-ok">
             Saved ✓
           </span>
         )}

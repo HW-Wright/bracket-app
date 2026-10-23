@@ -45,10 +45,10 @@ function UserRow({ user, isSelf, onChanged }: { user: Profile; isSelf: boolean; 
     <li className="flex flex-col gap-3 border-b border-line py-3 last:border-0">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className={user.active ? '' : 'text-ivory-muted line-through'}>
-            {user.display_name} {user.is_admin && <span className="label-caps ml-1 text-gold-500">Admin</span>}
+          <p className={user.active ? '' : 'text-muted line-through'}>
+            {user.display_name} {user.is_admin && <span className="label-caps ml-1 text-orange!">Admin</span>}
           </p>
-          <p className="text-xs text-ivory-muted">
+          <p className="text-xs text-muted">
             @{user.username}
             {user.must_change_password && ' · must change password'}
             {!user.active && ' · deactivated'}
@@ -80,7 +80,7 @@ function UserRow({ user, isSelf, onChanged }: { user: Profile; isSelf: boolean; 
         </form>
       )}
       <ErrorText>{error}</ErrorText>
-      {notice && <p role="status" className="text-sm text-ok">{notice}</p>}
+      {notice && <p role="status" className="text-base font-semibold text-ok">{notice}</p>}
     </li>
   )
 }
@@ -135,16 +135,14 @@ export default function AdminUsers() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <h2 className="label-caps mb-2">Users</h2>
+      <Card title="Users">
         <ul>
           {users.map((u) => (
             <UserRow key={u.id} user={u} isSelf={u.id === profile?.id} onChanged={load} />
           ))}
         </ul>
       </Card>
-      <Card>
-        <h2 className="label-caps mb-4">Add a user</h2>
+      <Card title="Add a user">
         <AddUser onAdded={load} />
       </Card>
     </div>

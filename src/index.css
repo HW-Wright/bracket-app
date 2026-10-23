@@ -1,25 +1,26 @@
 @import 'tailwindcss';
 
-/* Design tokens. Gold is an accent only: rules, borders, headings, selected states. */
+/* Design tokens: direction D "Broadcast Scoreboard" (SPEC section 13). */
 @theme {
-  --color-ink-950: #0b0a09;
-  --color-ink-900: #14120f;
-  --color-ink-800: #1d1a16;
-  --color-ink-700: #2a261f;
-  --color-line: #3a342a;
+  --color-navy-950: #0a1640; /* page */
+  --color-navy-900: #0e1b4d; /* panel headers */
+  --color-navy-800: #13235e; /* panels, inputs */
+  --color-navy-700: #1d3180; /* active tab */
+  --color-line: #2a3f8f;
+  --color-led: #05091c; /* LED inset ground */
 
-  --color-gold-300: #e2c98a;
-  --color-gold-500: #c9a54c;
-  --color-gold-700: #8a6f2e;
+  --color-orange: #ff7a1a; /* broadcast primary */
+  --color-yellow: #ffd21f; /* broadcast secondary */
+  --color-amber: #ffb21e; /* LED digits */
 
-  --color-ivory: #f1e9d8;
-  --color-ivory-muted: #b9ae97;
+  --color-muted: #aab6e0;
+  --color-live: #d62b31; /* LIVE badge ground (white text) */
+  --color-danger: #ff6b6b; /* red text on navy */
+  --color-ok: #7ee08a;
 
-  --color-danger: #e07a6a;
-  --color-ok: #9cc58a;
-
-  --font-display: 'Limelight', 'Didot', serif;
-  --font-sans: 'Jost', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Russo One', 'Arial Black', sans-serif;
+  --font-led: 'DotGothic16', ui-monospace, monospace;
+  --font-sans: 'Saira Condensed', 'Arial Narrow', ui-sans-serif, sans-serif;
 }
 
 @layer base {
@@ -27,20 +28,25 @@
     color-scheme: dark;
   }
   body {
-    @apply bg-ink-950 text-ivory font-sans antialiased;
+    @apply bg-navy-950 text-white font-sans antialiased;
     min-height: 100dvh;
   }
 }
 
 @utility label-caps {
-  @apply text-xs font-medium uppercase tracking-[0.2em] text-ivory-muted;
+  @apply text-sm font-bold uppercase tracking-[0.15em] text-muted;
 }
 
-/* Fine double gold rule. */
-@utility rule-double {
-  height: 5px;
-  border-top: 1px solid var(--color-gold-700);
-  border-bottom: 1px solid var(--color-gold-700);
+/* Slanted broadcast caption/badge. */
+@utility slant {
+  transform: skewX(-12deg);
+}
+
+/* Dark dot-matrix LED inset for numbers. */
+@utility led {
+  background-color: var(--color-led);
+  background-image: radial-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1.2px);
+  background-size: 4px 4px;
 }
 
 /* Room for the sticky header / bottom bars when the browser scrolls a focused field into view. */

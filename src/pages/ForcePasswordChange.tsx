@@ -7,7 +7,7 @@ export default function ForcePasswordChange() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-4">
       <PageTitle eyebrow={`Welcome, ${profile?.display_name ?? ''}`}>Choose a new password</PageTitle>
-      <p className="mb-6 text-sm text-ivory-muted">
+      <p className="mb-6 text-base text-muted">
         Your starting password was temporary. Pick your own before you go any further.
       </p>
       <ChangePasswordForm />

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../../auth/AuthProvider'
 import { useBracket } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
-import { Card, PageTitle } from '../../components/ui'
+import { Badge, Card, Led, PageTitle } from '../../components/ui'
 import { listStatus, MAX_NOMINATIONS } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
 import NominationEditor from './NominationEditor'
@@ -33,26 +33,25 @@ function AllNominations({ rows }: { rows: NominationRow[] }) {
 
   return (
     <section className="mt-10">
-      <h2 className="label-caps mb-1">Everyone's nominations</h2>
-      <div className="rule-double mb-4 w-16" />
+      <Badge className="mb-3 ml-1">Everyone's nominations</Badge>
       {groups.length === 0 ? (
-        <p className="text-sm text-ivory-muted">Nobody nominated anything.</p>
+        <p className="text-base text-muted">Nobody nominated anything.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {groups.map((g) => (
-            <details key={g.name} className="group rounded-sm border border-line bg-ink-900" open>
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4">
-                <span>{g.name}</span>
+            <details key={g.name} className="group border border-line bg-navy-800" open>
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 border-b-2 border-orange bg-navy-900 px-4">
+                <span className="text-lg font-extrabold tracking-wider uppercase">{g.name}</span>
                 {listStatus(g.items.map((n) => n.text)).complete ? (
                   <span className="label-caps">{g.items.length} picks</span>
                 ) : (
                   <span className="label-caps text-danger">Incomplete · not counted</span>
                 )}
               </summary>
-              <ol className="border-t border-line px-4 py-2">
+              <ol className="px-3 py-2">
                 {g.items.map((n) => (
-                  <li key={n.rank} className="flex gap-3 py-1 text-sm">
-                    <span className="w-5 shrink-0 text-right text-gold-500">{n.rank}</span>
+                  <li key={n.rank} className="flex items-center gap-3 py-1 text-lg">
+                    <Led className="w-9 shrink-0 text-center">{n.rank}</Led>
                     <span>{n.text}</span>
                   </li>
                 ))}
@@ -92,7 +91,7 @@ export default function Nominate() {
       <>
         <PageTitle>Nominate</PageTitle>
         <Card>
-          <p className="text-sm text-ivory-muted">Nominations open when Harry starts the next bracket.</p>
+          <p className="text-base text-muted">Nominations open when Harry starts the next bracket.</p>
         </Card>
       </>
     )
@@ -104,7 +103,7 @@ export default function Nominate() {
     return (
       <>
         <PageTitle eyebrow="Nominations open">{bracket.title}</PageTitle>
-        {bracket.description && <p className="-mt-2 mb-4 text-sm text-ivory-muted">{bracket.description}</p>}
+        {bracket.description && <p className="-mt-2 mb-4 text-base text-muted">{bracket.description}</p>}
         {progress && (
           <div className="mb-4">
             <ProgressLine {...progress} />
@@ -126,20 +125,20 @@ export default function Nominate() {
     <>
       <PageTitle eyebrow="Nominations closed">{bracket.title}</PageTitle>
       <Card>
-        <h2 className="label-caps mb-3">Your picks</h2>
+        <h2 className="mb-3 text-base font-extrabold tracking-[0.15em] uppercase">Your picks</h2>
         {mine.length > 0 && !listStatus(mine.map((n) => n.text)).complete && (
-          <p className="mb-3 text-sm text-danger">
+          <p className="mb-3 text-base font-semibold text-danger">
             Your list wasn't complete ({MAX_NOMINATIONS} entries, no repeats) when nominations closed, so it doesn't count
             towards this bracket.
           </p>
         )}
         {mine.length === 0 ? (
-          <p className="text-sm text-ivory-muted">You didn't nominate anything this time.</p>
+          <p className="text-base text-muted">You didn't nominate anything this time.</p>
         ) : (
           <ol>
             {mine.map((n) => (
-              <li key={n.rank} className="flex gap-3 py-1">
-                <span className="w-5 shrink-0 text-right font-display text-gold-500">{n.rank}</span>
+              <li key={n.rank} className="flex items-center gap-3 py-1 text-lg">
+                <Led className="w-9 shrink-0 text-center">{n.rank}</Led>
                 <span>{n.text}</span>
               </li>
             ))}

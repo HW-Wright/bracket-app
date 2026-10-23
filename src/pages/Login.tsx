@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthProvider'
-import { Button, ErrorText, TextField } from '../components/ui'
+import { Badge, Button, ErrorText, TextField } from '../components/ui'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -18,10 +18,18 @@ export default function Login() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-8 px-4">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <p className="label-caps">Members only</p>
-        <h1 className="font-display text-4xl leading-tight text-gold-500">The Gang Does a Bracket</h1>
-        <div className="rule-double w-32" />
+      <div className="flex flex-col items-start gap-2">
+        <Badge tone="live" className="ml-1">
+          Members only
+        </Badge>
+        <div className="slant ml-1 border-l-[6px] border-orange bg-navy-800 px-4 py-3">
+          <h1 className="font-display text-4xl leading-none uppercase italic">
+            The Gang <span className="text-orange">Does a Bracket</span>
+          </h1>
+        </div>
+        <Badge tone="yellow" className="ml-5">
+          Tip-off soon
+        </Badge>
       </div>
       <form onSubmit={submit} className="flex flex-col gap-4">
         <TextField

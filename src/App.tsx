@@ -32,6 +32,7 @@ function Gate() {
             <Route path="nominate" element={<Nominate />} />
             <Route path="vote" element={<Placeholder title="Vote" note="Nothing to vote on yet." />} />
             <Route path="bracket" element={<Placeholder title="Bracket" note="The bracket appears once seeding is locked." />} />
+            <Route path="stats" element={<Placeholder title="Stats" note="Upsets and running vote totals appear once voting starts." />} />
             <Route path="archive" element={<Placeholder title="Archive" note="No past brackets yet." />} />
             <Route path="profile" element={<Profile />} />
             <Route path="admin" element={<Admin />} />

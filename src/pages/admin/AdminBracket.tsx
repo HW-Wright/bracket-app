@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { rpcMessage, useBracket, type Bracket, type BracketPhase } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
-import { Button, Card, ErrorText, TextField } from '../../components/ui'
+import { Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
 import { supabase } from '../../lib/supabase'
 
 interface UserStatus {
@@ -30,12 +30,15 @@ function useAdminStatus(bracketId: string | undefined) {
 
 function StatusList({ rows }: { rows: UserStatus[] }) {
   return (
-    <ul className="divide-y divide-line rounded-sm border border-line">
+    <ul className="divide-y divide-line border border-line">
       {rows.map((r) => (
-        <li key={r.user_id} className="flex min-h-11 items-center justify-between gap-3 px-3 text-sm">
-          <span>{r.display_name}</span>
-          <span className={r.complete ? 'text-ok' : r.count === 0 ? 'text-ivory-muted' : 'text-gold-300'}>
-            {r.complete ? '15/15 ✓' : r.count === 0 ? 'Nothing yet' : `${r.count}/15${r.has_repeats ? ' · has a repeat' : ''}`}
+        <li key={r.user_id} className="flex min-h-11 items-center justify-between gap-3 pr-3 text-lg">
+          <span className="flex items-center gap-3">
+            <Led className={`flex h-11 w-14 items-center justify-center ${r.complete ? 'text-ok!' : ''}`}>{r.count}/15</Led>
+            <span className="font-semibold">{r.display_name}</span>
+          </span>
+          <span className={`text-base font-bold uppercase ${r.complete ? 'text-ok' : r.has_repeats ? 'text-danger' : 'text-muted'}`}>
+            {r.complete ? 'Submitted ✓' : r.count === 0 ? 'Nothing yet' : r.has_repeats ? 'Has a repeat' : 'Draft'}
           </span>
         </li>
       ))}
@@ -70,7 +73,7 @@ function BracketForm({ bracket, onDone }: { bracket?: Bracket; onDone: () => voi
           onChange={(e) => setDescription(e.target.value)}
           maxLength={280}
           rows={3}
-          className="rounded-sm border border-line bg-ink-900 px-3 py-2 text-base text-ivory outline-none focus:border-gold-500"
+          className="border border-line bg-navy-800 px-3 py-2 text-base text-white outline-none focus:border-orange"
         />
       </label>
       <ErrorText>{error}</ErrorText>
@@ -117,10 +120,9 @@ export default function AdminBracket() {
 
   if (!bracket || bracket.phase === 'complete') {
     return (
-      <Card>
-        <h2 className="label-caps mb-4">Start a new bracket</h2>
+      <Card title="Start a new bracket">
         {bracket && (
-          <p className="mb-4 text-sm text-ivory-muted">“{bracket.title}” will move to the archive.</p>
+          <p className="mb-4 text-base text-muted">“{bracket.title}” will move to the archive.</p>
         )}
         <BracketForm onDone={refresh} />
       </Card>
@@ -128,12 +130,12 @@ export default function AdminBracket() {
   }
 
   return (
-    <Card>
+    <Card
+      title="Current bracket"
+      aside={<Badge tone={bracket.phase === 'nominations' || bracket.phase === 'live' ? 'live' : 'yellow'}>{bracket.phase}</Badge>}
+    >
       <div className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="label-caps">Current bracket · {bracket.phase}</h2>
-          <p className="mt-1 font-display text-xl text-gold-500">{bracket.title}</p>
-        </div>
+        <p className="font-display text-2xl leading-tight uppercase">{bracket.title}</p>
         {(bracket.phase === 'draft' || bracket.phase === 'nominations') && (
           <Button variant="ghost" onClick={() => setEditing(!editing)}>
             {editing ? 'Cancel' : 'Edit'}
@@ -181,7 +183,7 @@ export default function AdminBracket() {
               )}
               <button
                 type="button"
-                className="min-h-11 px-2 text-sm text-gold-500"
+                className="min-h-11 px-2 text-base font-bold text-orange uppercase"
                 onClick={() => {
                   reloadProgress()
                   reloadStatus()
@@ -212,12 +214,12 @@ export default function AdminBracket() {
         {bracket.phase === 'review' && (
           <>
             {status && incomplete.length > 0 && (
-              <p className="text-sm text-ivory-muted">
+              <p className="text-base text-muted">
                 Not counted (incomplete at close): {incomplete.map((r) => r.display_name).join(', ')}. Reopen nominations to
                 let them finish.
               </p>
             )}
-            <p className="text-sm text-ivory-muted">Review, merging and seeding arrive in the next build phase.</p>
+            <p className="text-base text-muted">Review, merging and seeding arrive in the next build phase.</p>
             <Button
               variant="ghost"
               disabled={busy}

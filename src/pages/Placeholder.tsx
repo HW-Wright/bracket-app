@@ -5,7 +5,7 @@ export default function Placeholder({ title, note }: { title: string; note: stri
     <>
       <PageTitle>{title}</PageTitle>
       <Card>
-        <p className="text-sm text-ivory-muted">{note}</p>
+        <p className="text-base text-muted">{note}</p>
       </Card>
     </>
   )

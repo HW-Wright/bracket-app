@@ -20,7 +20,7 @@ A private, mobile-first web app where eight friends nominate entries on a changi
 
 ## 1. Stack
 
-- **Front end:** Vite + React + TypeScript. Tailwind CSS with custom design tokens (or CSS modules if you judge it cleaner for the deco styling). Static build only.
+- **Front end:** Vite + React + TypeScript. Tailwind CSS with custom design tokens. Static build only.
 - **Routing:** must work on GitHub Pages. Use hash routing, or a `404.html` SPA fallback. Your call, but deep links must survive a refresh.
 - **Backend:** Supabase free tier: Postgres, Auth, Storage, Realtime, Postgres functions (RPC), and Edge Functions only where the service role key is required.
 - **Database changes:** all schema, RLS policies, functions and triggers as migrations in `supabase/migrations`, applied with the CLI. No manual dashboard edits except where unavoidable (document them in the README if so).
@@ -95,7 +95,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - Harry can upload one optional image per entry, at any time (including after lock).
 - Resize and compress client-side before upload (e.g. max 800px longest side, WebP, roughly 200KB or less).
 - Store in a Supabase Storage bucket: public read, admin-only write (enforce with storage policies).
-- Entries without an image get a styled deco placeholder (frame plus initial or monogram).
+- Entries without an image get a styled placeholder (LED panel with initials).
 
 ### 5.5 Scoring and seeding
 - **Points:** each nomination is worth `16 - rank` (rank 1 = 15 points, rank 15 = 1 point). An entry's score is the sum across nominators.
@@ -165,10 +165,18 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ---
 
+### 9.1 Stats page (added by Harry, 2026-10-23)
+- **Total votes (rolling):** every entry's cumulative votes across all stages so far, including live tallies in the open stage, with win–loss record and seed. Sorted by votes, then seed.
+- **Upsets:** every decided matchup where the lower seed (higher number) beat the higher seed, biggest seed gap first, showing seeds, score, round and any coin-toss or admin badge.
+- Lives on its own bottom-nav tab. Profile moves to an avatar button in the header to make room.
+
+### 9.2 Home: your picks still alive
+- During a live bracket, Home shows how many of your 15 nominations are still in the bracket (e.g. "13/15"), listing each one's state: leading, trailing or tied in the open stage, waiting for a later stage, knocked out, or missed the cut at seeding.
+
 ## 10. Champion and podium
 
-- When stage 10 closes, show a **champion screen**: the winner presented in the full deco treatment, a **podium** (1st champion, 2nd final loser, 3rd third-place playoff winner), and the champion's path.
-- Tasteful animation only; respect `prefers-reduced-motion`.
+- When stage 10 closes, show a **champion screen**: the winner presented as a full broadcast title card, a **podium** (1st champion, 2nd final loser, 3rd third-place playoff winner), and the champion's path.
+- Broadcast-style celebration (e.g. a champion title card) only; respect `prefers-reduced-motion`.
 
 ---
 
@@ -187,9 +195,10 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - **Nominate** (own list while open; everyone's lists after close).
 - **Vote** (current stage).
 - **Bracket** (history and tree).
+- **Stats** (rolling vote totals, upsets).
 - **Entry** (detail and path).
 - **Archive**.
-- **Profile** (change password, log out).
+- **Profile** (change password, log out), reached from the header avatar.
 - **Admin** (visible to Harry only): bracket setup, nominations control, review and merge, images, seeding preview and lock, stage control, user management.
 - Mobile bottom navigation; admin reached via an extra tab or menu item for Harry only.
 
@@ -197,30 +206,34 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ## 13. Design
 
-### Mood
-- **Sleek dark art deco.** Style reference: the "dark deco" look of *Batman: The Animated Series* (1992): scenes painted on black so shapes emerge from shadow, silhouetted deco skyscrapers, searchlight beams, film-noir lighting, bold title-card typography.
-- **Evoke the mood only.** Use no Batman or DC characters, logos, bat motifs, names, or trademarked fonts anywhere.
+**Direction D, "Broadcast Scoreboard"** (chosen by Harry, 2026-10-23, replacing the original art deco brief). Reference mockups: the Bracket Theme Directions canvas, row D (Home, Vote, Stats).
 
-### Palette
-- **Black and gold, restrained.** Near-black and charcoal surfaces in a few layered shades, a single muted gold/brass accent, warm ivory text.
-- Gold is an accent: headings, fine rules, borders, active and selected states, the champion screen. Keep it to a small fraction of any screen. Do not overdo it.
-- Define all colours as design tokens. Meet WCAG AA contrast.
+### Mood
+- A retro arcade take on a 90s TV sports broadcast of a college basketball tournament: on-screen broadcast graphics (slanted banners and caption bars, LIVE badge) combined with arena LED scoreboard numbers.
+- Evoke the genre only. Do not use NCAA trademarks ("March Madness", "Final Four", "Elite Eight", "Sweet Sixteen") or any network or league branding.
+
+### Palette (define all as tokens; meet WCAG AA)
+- Grounds: navy `#0a1640` (page), `#13235e` (panels), `#0e1b4d` (panel headers), `#1d3180` (active tab), lines `#2a3f8f`.
+- Broadcast accent: court orange `#ff7a1a` (primary: header rule, selected pick, section labels); yellow `#ffd21f` (secondary: VS badge, offset shadows, sub-captions).
+- LED: amber `#ffb21e` digits on dark dot-matrix insets (`#05091c` + fine dot texture).
+- Status: red `#e8343a` (LIVE, TIED, upsets, errors), muted text `#aab6e0`, text white.
 
 ### Typography
-- A deco display face (e.g. from Google Fonts: Limelight, Poiret One, or similar) for titles and key headings only.
-- A clean, legible geometric sans for body text and controls.
-- Uppercase, letter-spaced small labels for section headers and seeds.
+- Display: **Russo One** (titles, wordmark in italic, buttons, VS badge).
+- Numbers: **DotGothic16** on LED insets for every seed, vote count, score, stage counter and progress fraction.
+- Body and controls: **Saira Condensed** (500–800), uppercase letter-spaced for labels.
 
 ### Motifs
-- Fine double gold rules, stepped and chevron borders, sunburst or fan shapes, an ornamental "vs" divider on matchup cards, subtle grain or vignette. Build with lightweight CSS/SVG.
-- Matchup cards should feel like a theatre marquee or film title card.
+- Slanted (skewX) caption bars and badges for eyebrows and section labels; slanted pick bars with a yellow offset shadow on the selected one.
+- LED ticker strip at the top: LIVE dot plus the current phase and progress.
+- **Every matchup sits in its own "GAME n" box** (bordered panel with an LED header strip: game number left, VOTES / TIED / result right), so it's always clear which two entries face each other. Inside: two pick bars with a tally bar and VS (or TIED) badge between them.
+- Coin-toss and admin-decision badges in the same slanted-badge style.
 
 ### Usability
 - Mobile-first; minimum 44px tap targets; works one-handed.
 - Fast on slow connections: small bundle, lazy-loaded images.
-- App name **"The Gang Does a Bracket"** in the header, manifest and page title. Design a simple original deco monogram or wordmark for the icon.
-
----
+- App name **"The Gang Does a Bracket"** in the header, manifest and page title. Design a simple original icon in this style for the home screen.
+- Respect `prefers-reduced-motion`.
 
 ## 14. Build phases and acceptance criteria
 
@@ -230,7 +243,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 4. **Review and seeding:** full list, duplicate suggestions, merge/unmerge with the best-rank rule, manual add, remove/restore, images, scoring, stored random tiebreaks, preview with cut line, lock. *Done when unit tests cover scoring, merge rules and ordering, and locking produces a correct bracket.*
 5. **Voting and advancement:** stages, voting, hidden voters with visible live tallies, close-and-advance RPC with server-side coin toss, undo, override. *Done when RLS tests prove voters are hidden until close and a full simulated bracket advances correctly.*
 6. **History, entry paths, champion, podium, archive.**
-7. **Design polish:** full deco pass, mobile testing at common phone widths, accessibility check, reduced motion.
+7. **Design polish:** full broadcast-scoreboard pass, mobile testing at common phone widths, accessibility check, reduced motion.
 8. **Dry run tooling:** a dev-only script that simulates a complete bracket with fake nominations and random votes from all eight users against the test environment, then wipes it. Use it to verify everything end to end.
 
 ---
