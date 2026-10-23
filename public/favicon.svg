@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" fill="#0a1640"/>
-  <!-- slanted broadcast bar with yellow offset -->
+  <!-- slanted broadcast bar with a yellow offset shadow -->
   <path d="M15 14h45l-9 36H6z" fill="#ffd21f"/>
   <path d="M12 11h45l-9 36H3z" fill="#ff7a1a"/>
-  <!-- bracket glyph: four lines merge to a final -->
-  <g fill="none" stroke="#0a1640" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter">
-    <path d="M14 17h9v8h-9M14 33h9v8h-9"/>
-    <path d="M23 21h7v16h-7M30 29h12"/>
+  <!-- bracket: four entries pair up, then meet, then lead to the winner's slot -->
+  <g fill="none" stroke="#0a1640" stroke-width="3.2" stroke-linecap="square">
+    <path d="M12 18H22M10 27H22M22 18V27M22 22.5H28"/>
+    <path d="M8 34H22M6 43H22M22 34V43M22 38.5H28"/>
+    <path d="M28 22.5V38.5M28 30.5H36"/>
   </g>
-  <rect x="42" y="25" width="9" height="8" fill="#ffffff"/>
+  <rect x="36" y="26" width="10" height="9" fill="#ffffff"/>
 </svg>

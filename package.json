@@ -18,7 +18,8 @@
     "test:storage": "node scripts/test-storage-local.ts",
     "test:realtime": "node scripts/test-realtime-local.ts",
     "test-bracket": "node --env-file=.env scripts/test-bracket.ts",
-    "test:queries": "node scripts/smoke-queries-local.ts"
+    "test:queries": "node scripts/smoke-queries-local.ts",
+    "dry-run": "node scripts/dry-run.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

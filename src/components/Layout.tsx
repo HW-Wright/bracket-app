@@ -50,7 +50,7 @@ function Ticker() {
         draft: ['COMING SOON', bracket.title],
         nominations: ['NOMINATIONS OPEN', bracket.title, progress ? `${progress.submitted} OF ${progress.total} HAVE SUBMITTED` : ''],
         review: ['NOMINATIONS CLOSED', 'SEEDING IN PROGRESS'],
-        live: ['VOTING LIVE', bracket.title],
+        live: ['VOTING OPEN', bracket.title],
         complete: ['FINAL', bracket.title],
       }[bracket.phase].filter(Boolean)
 

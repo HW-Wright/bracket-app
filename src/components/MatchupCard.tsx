@@ -32,7 +32,7 @@ function PickBar({
           </span>
         )}
         <span className="flex min-w-0 flex-col text-left">
-          <span className={`truncate text-[22px] leading-6 ${highlight ? 'font-extrabold' : 'font-bold'}`}>{entry?.name ?? 'To be decided'}</span>
+          <span className={`line-clamp-2 text-[22px] leading-6 break-words ${highlight ? 'font-extrabold' : 'font-bold'}`}>{entry?.name ?? 'To be decided'}</span>
           {picked && <span className="text-xs font-extrabold tracking-[0.15em]">✓ YOUR PICK</span>}
           {won && !picked && <span className="text-xs font-extrabold tracking-[0.15em]">WINNER</span>}
         </span>

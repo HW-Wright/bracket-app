@@ -74,3 +74,15 @@ html[data-keyboard] .unstick-with-keyboard {
     transform: none;
   }
 }
+
+/* Respect reduced motion everywhere (transitions, smooth scroll, the champion entrance). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -50,7 +50,8 @@ export function Badge({
 
 /** A number on a dark dot-matrix LED inset. */
 export function Led({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <span className={`led inline-block px-2 font-led text-amber ${className}`}>{children}</span>
+  // inline-flex + centring so callers can size the box (h-11 w-11 …) and the digits stay centred.
+  return <span className={`led inline-flex items-center justify-center px-2 font-led text-amber ${className}`}>{children}</span>
 }
 
 /** Panel. With a title it gets the broadcast header strip. */

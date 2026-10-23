@@ -58,6 +58,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Pure derivations in `src/lib/stats.ts` (upsets, voteTotals, entryPath, podium, pickStatus) with Vitest coverage.
 - Screens: `/bracket` (round tabs + tree, champion card when complete), `/entry/:id`, `/stats`, `/archive`, `/archive/:id`. `MatchupCard` is shared (vote mode via `onPick`, read-only via `link`).
 - `npm run test:queries`: PostgREST query smoke test (local).
+- `npm run dry-run [-- --stages=N | --keep | --wipe]`: full simulated bracket on the local stack (8 fake users).
 
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
