@@ -225,7 +225,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### Typography (direction F format, adopted 2026-10-24)
 - Headlines, buttons and tabs: **Roboto Condensed** 800 italic caps. Body and controls: Roboto Condensed 500–700.
-- Scrolling text in both crawls: **DotGothic16** dot-matrix caps in amber (old-school LED, Harry 2026-10-24). Classified results: **IBM Plex Mono** 600 caps.
+- Teleprinter text (both crawls, classified results): **IBM Plex Mono** 600 caps in amber.
 - Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
 ### Motifs (direction F layouts in direction D colours)

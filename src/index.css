@@ -20,8 +20,7 @@
 
   --font-display: 'Roboto Condensed', 'Arial Narrow', sans-serif; /* headlines: 800 italic caps */
   --font-led: 'Roboto Condensed', 'Arial Narrow', sans-serif; /* numbers: bold condensed */
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* classified results */
-  --font-crawl: 'DotGothic16', ui-monospace, monospace; /* old-school dot-matrix scrolling text in both crawls */
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* teleprinter crawls, classified results */
   --font-sans: 'Roboto Condensed', 'Arial Narrow', ui-sans-serif, sans-serif;
 }
 
