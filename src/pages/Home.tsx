@@ -4,22 +4,13 @@ import { useAuth } from '../auth/AuthProvider'
 import { useBracket, type Bracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
 import { useOpenStage } from '../bracket/useStage'
+import MysterySeeds from '../components/MysterySeeds'
 import PicksAlive from '../components/PicksAlive'
-import { Card, Led, PageTitle } from '../components/ui'
+import { ActionLink, Card, Led, PageTitle } from '../components/ui'
 import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
 import { supabase } from '../lib/supabase'
 
-/** The one big call to action: an orange bar with an angled right edge. */
-function Action({ to, children }: { to: string; children: string }) {
-  return (
-    <Link
-      to={to}
-      className="plate flex min-h-14 items-center bg-orange pr-8 pl-4 font-display text-[22px] leading-tight font-extrabold text-navy-950 uppercase italic hover:bg-yellow"
-    >
-      {children} ▸
-    </Link>
-  )
-}
+const Action = ActionLink
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
@@ -144,7 +135,9 @@ export default function Home() {
 
   return (
     <>
-      <PageTitle eyebrow={eyebrow}>{bracket.title}</PageTitle>
+      <PageTitle eyebrow={eyebrow} live={bracket.phase === 'live' || bracket.phase === 'nominations'}>
+        {bracket.title}
+      </PageTitle>
       {bracket.description && <p className="-mt-2 mb-5 text-base text-muted">{bracket.description}</p>}
 
       {bracket.phase === 'draft' && (
@@ -164,7 +157,8 @@ export default function Home() {
       {bracket.phase === 'live' && <VotingLive bracket={bracket} />}
       {bracket.phase === 'complete' && <Action to="/bracket">See the champion</Action>}
       {(bracket.phase === 'live' || bracket.phase === 'complete') && (
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col gap-6">
+          <MysterySeeds bracketId={bracket.id} />
           <PicksAlive bracketId={bracket.id} />
         </div>
       )}

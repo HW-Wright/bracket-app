@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useBracket } from '../bracket/BracketProvider'
 import { useOpenStage } from '../bracket/useStage'
 import MatchupCard from '../components/MatchupCard'
-import { Badge, Card, ErrorText, Led, PageTitle } from '../components/ui'
+import { Card, ErrorText, Led, PageTitle } from '../components/ui'
 
 const ROUND_NAMES = ['', 'Round of 64', 'Round of 32', 'Round of 16', 'Quarter-finals', 'Semi-finals', 'The Final']
 
@@ -30,17 +30,11 @@ export default function Vote() {
 
   return (
     <>
-      <div className="mb-5 flex items-end justify-between gap-3">
-        <div className="flex min-w-0 flex-col items-start">
-          <Badge>
-            Stage {stage.number}
-            {sectionLabel ? ` · ${sectionLabel}` : ''}
-          </Badge>
-          <div className="plate bg-white py-1.5 pr-8 pl-3 text-navy-950">
-            <h1 className="font-display text-[28px] leading-[1.05] font-extrabold uppercase italic">{ROUND_NAMES[stage.round]}</h1>
-          </div>
-        </div>
-        <div className="led shrink-0 border border-line px-2.5 py-1 text-center" role="status">
+      <div className="flex items-start justify-between gap-3">
+        <PageTitle eyebrow={`Stage ${stage.number}${sectionLabel ? ` · ${sectionLabel}` : ''}`} sub={`${matchups.length} games`} live>
+          {ROUND_NAMES[stage.round]}
+        </PageTitle>
+        <div className="led mt-3 shrink-0 border border-line px-2.5 py-1 text-center" role="status">
           <span className="block font-led text-2xl leading-7 font-extrabold text-amber">
             {mine}/{matchups.length}
           </span>

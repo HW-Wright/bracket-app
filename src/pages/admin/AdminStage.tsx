@@ -129,6 +129,19 @@ export default function AdminStage() {
     loadLastClosed()
   }, [loadLastClosed])
 
+  // Brackets locked before mystery seeds existed can have them dealt now.
+  const [needsDeal, setNeedsDeal] = useState(false)
+  useEffect(() => {
+    if (!bracket) return
+    supabase.rpc('mystery_board', { p_bracket_id: bracket.id }).then(({ data }) => setNeedsDeal((data ?? []).length === 0))
+  }, [bracket])
+  async function deal() {
+    if (!confirm('Deal a random secret entry to every active player now?')) return
+    const { error } = await supabase.rpc('deal_mystery_seeds', { p_bracket_id: bracket!.id })
+    setError(rpcMessage(error))
+    if (!error) setNeedsDeal(false)
+  }
+
   if (!bracket || (bracket.phase !== 'live' && bracket.phase !== 'complete')) return null
 
   async function after() {
@@ -178,6 +191,11 @@ export default function AdminStage() {
           </>
         ) : (
           <p className="text-base text-muted">Every stage is closed. The bracket is complete.</p>
+        )}
+        {needsDeal && (
+          <Button variant="ghost" onClick={deal}>
+            Deal mystery seeds
+          </Button>
         )}
         {lastClosed && (
           <>

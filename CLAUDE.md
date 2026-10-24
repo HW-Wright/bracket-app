@@ -60,13 +60,17 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - `npm run test:queries`: PostgREST query smoke test (local).
 - `npm run dry-run [-- --stages=N | --keep | --wipe]`: full simulated bracket on the local stack (8 fake users).
 
+## Mystery seeds
+- `mystery_seeds` (no client access at all) is dealt by `assign_mystery_seeds()` at the end of `lock_seeding()`; `deal_mystery_seeds()` (admin) for brackets locked earlier.
+- Clients read only `mystery_board(bracket)`: rows in seed order with entry fields null unless it's the caller's own row or revealed (lost a non-third-place matchup, or won the final). Never expose seed numbers for hidden rows.
+
 ## Conventions
 - All schema, RLS, functions, triggers and storage policies live in `supabase/migrations`. No dashboard edits.
 - RLS on every table. Privacy rules (blind nominations, hidden voters) are enforced in the DB, not just the UI.
 - Client env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (public). `SUPABASE_SECRET_KEY` only in gitignored `.env` and function secrets. Never commit `.env` or `users.local.json`.
 - GitHub Actions reads the public values from repo **variables** (not secrets) of the same names.
 - Commit after each build phase, with tests passing.
-- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, white `plate` title plates, panels with navy-700 header strips. Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
+- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, `PageTitle` (plate on offset orange box with overlapping tabs) and `ActionLink` (orange bar on yellow offset), panels with navy-700 header strips, `Crawl` tone orange (top) / yellow (results). Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
 
 ## Status
 Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 done (6 stages, one per round). Phase 6 built; next Phase 7 (design polish) and 8 (dry run).

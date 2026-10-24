@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router'
 import { rpcMessage, useBracket, type Bracket, type BracketPhase } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
-import { Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
+import { ActionLink, Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
 import { IMAGE_BUCKET } from '../../lib/image'
 import { supabase } from '../../lib/supabase'
 import { AllNominations, type NominationRow } from '../nominate/Nominate'
@@ -268,12 +268,7 @@ export default function AdminBracket() {
                 let them finish.
               </p>
             )}
-            <Link
-              to="/admin/review"
-              className="plate flex min-h-14 items-center bg-orange pr-8 pl-4 font-display text-xl font-extrabold text-navy-950 uppercase italic hover:bg-yellow"
-            >
-              Review &amp; seeding ▸
-            </Link>
+            <ActionLink to="/admin/review">Review & seeding</ActionLink>
             <Button
               variant="ghost"
               disabled={busy}

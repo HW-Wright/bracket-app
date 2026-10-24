@@ -58,22 +58,17 @@ function Ticker() {
       }[bracket.phase].filter(Boolean)
 
   return (
-    <div className="border-b border-line">
-      <Crawl
-        label="News"
-        items={items}
-        pinned={
-          live ? (
-            <span className="flex items-center gap-1.5 bg-live px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-white italic">
-              <span className="h-2 w-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden />
-              LIVE
-            </span>
-          ) : (
-            <span className="flex items-center bg-orange px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-navy-950 italic">LATEST</span>
-          )
-        }
-      />
-    </div>
+    <Crawl
+      label="News"
+      tone="orange"
+      items={items}
+      pinned={
+        <span className="flex items-center gap-1.5 bg-navy-950 px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-white italic">
+          {live && <span className="h-2 w-2 rounded-full bg-danger motion-safe:animate-pulse" aria-hidden />}
+          {live ? 'LIVE' : 'LATEST'}
+        </span>
+      }
+    />
   )
 }
 
@@ -90,13 +85,12 @@ function ResultsCrawl() {
   if (!results) return null
   const round = ['R64', 'R32', 'R16', 'QF', 'SF', 'FINAL'][results.stage.round - 1]
   return (
-    <div className="border-t border-line">
-      <Crawl
-        label={`${results.stage.label} results`}
-        items={results.lines}
-        pinned={<span className="flex items-center bg-white px-2.5 font-sans text-[12px] font-extrabold text-navy-950 italic">{round} RESULTS</span>}
-      />
-    </div>
+    <Crawl
+      label={`${results.stage.label} results`}
+      tone="yellow"
+      items={results.lines}
+      pinned={<span className="flex items-center bg-navy-950 px-2.5 font-sans text-[12px] font-extrabold text-yellow italic">{round} RESULTS</span>}
+    />
   )
 }
 

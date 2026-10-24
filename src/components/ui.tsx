@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react'
+import { Link } from 'react-router'
 
 export function Button({
   variant = 'primary',
@@ -79,15 +80,53 @@ export function Card({
   )
 }
 
-export function PageTitle({ eyebrow, children }: { eyebrow?: string; children: ReactNode }) {
+/**
+ * Page title: white plate on an offset orange box, the eyebrow tab overlapping its top edge and an optional
+ * yellow caption overlapping its bottom edge (direction G4, "overlaps + shadow").
+ */
+export function PageTitle({
+  eyebrow,
+  sub,
+  live = false,
+  children,
+}: {
+  eyebrow?: string
+  sub?: string
+  live?: boolean
+  children: ReactNode
+}) {
   return (
-    <header className="mb-5 flex flex-col items-start">
-      {eyebrow && <Badge>{eyebrow}</Badge>}
-      {/* White title plate with an angled right edge. */}
-      <div className="plate max-w-full bg-white py-1.5 pr-8 pl-3 text-navy-950">
+    <header className={`relative mr-2 mb-8 w-fit max-w-[calc(100%-0.5rem)] ${eyebrow ? 'mt-3' : ''}`}>
+      <div aria-hidden className="plate absolute inset-0 translate-x-[7px] translate-y-[7px] bg-orange" />
+      {eyebrow && (
+        <Badge tone={live ? 'live' : 'orange'} className="absolute -top-3 left-2.5 z-[2]">
+          {eyebrow}
+        </Badge>
+      )}
+      <div className={`plate relative bg-white pr-10 pl-3.5 text-navy-950 ${eyebrow ? 'pt-4' : 'pt-2.5'} ${sub ? 'pb-4' : 'pb-2.5'}`}>
         <h1 className="font-display text-[30px] leading-[1.05] font-extrabold uppercase italic">{children}</h1>
       </div>
+      {sub && (
+        <Badge tone="yellow" className="absolute -bottom-3.5 left-6 z-[2]">
+          {sub}
+        </Badge>
+      )}
     </header>
+  )
+}
+
+/** Main call to action: an orange angled bar on a yellow offset box. */
+export function ActionLink({ to, children }: { to: string; children: string }) {
+  return (
+    <div className="relative mr-[6px] mb-[6px]">
+      <div aria-hidden className="plate absolute inset-0 translate-x-[6px] translate-y-[6px] bg-yellow" />
+      <Link
+        to={to}
+        className="plate relative flex min-h-14 items-center bg-orange pr-8 pl-4 font-display text-[22px] leading-tight font-extrabold text-navy-950 uppercase italic hover:bg-white"
+      >
+        {children} ▸
+      </Link>
+    </div>
   )
 }
 

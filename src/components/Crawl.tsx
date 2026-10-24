@@ -7,7 +7,23 @@ import type { ReactNode } from 'react'
  * loop is seamless (the track moves left by exactly one copy, see .ticker-track in index.css). Speed is
  * constant per character. Static under prefers-reduced-motion.
  */
-export default function Crawl({ items, pinned, label }: { items: string[]; pinned?: ReactNode; label: string }) {
+const TONES = {
+  orange: 'bg-orange text-navy-950',
+  yellow: 'bg-yellow text-navy-950',
+} as const
+
+export default function Crawl({
+  items,
+  pinned,
+  label,
+  tone,
+}: {
+  items: string[]
+  pinned?: ReactNode
+  label: string
+  /** Bar colour (option G6 "split": orange news on top, yellow results below). */
+  tone: keyof typeof TONES
+}) {
   const chars = items.join(' ● ').length + 3
   const reps = Math.max(1, Math.ceil(70 / chars))
   const feed = Array.from({ length: reps }, () => items).flat()
@@ -18,7 +34,7 @@ export default function Crawl({ items, pinned, label }: { items: string[]; pinne
       {feed.map((item, i) => (
         <span key={i} className="flex items-center">
           {item}
-          <span className="px-2.5 text-line" aria-hidden>
+          <span className="px-2.5 opacity-45" aria-hidden>
             ●
           </span>
         </span>
@@ -30,7 +46,7 @@ export default function Crawl({ items, pinned, label }: { items: string[]; pinne
     <div
       role="marquee"
       aria-label={`${label}: ${items.join('. ')}`}
-      className="flex h-[26px] items-stretch overflow-hidden bg-navy-900 font-mono text-[13px] font-semibold whitespace-nowrap text-amber uppercase"
+      className={`flex h-[26px] items-stretch overflow-hidden font-mono text-[13px] font-semibold whitespace-nowrap uppercase ${TONES[tone]}`}
     >
       {pinned && <span className="relative z-[1] flex shrink-0 items-stretch">{pinned}</span>}
       <div className="flex min-w-0 flex-1 items-center overflow-hidden pl-2.5">

@@ -178,6 +178,12 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 ### 9.2 Home: your picks still alive
 - During a live bracket, Home shows how many of your 15 nominations are still in the bracket (e.g. "13/15"), listing each one's state: leading, trailing or tied in the open stage, waiting for a later stage, knocked out, or missed the cut at seeding.
 
+### 9.3 Mystery seeds (added by Harry, 2026-10-24)
+- When seeding is locked, every active player is dealt one random, distinct seeded entry. Only that player can see theirs (the admin included: nobody sees anyone else's hidden one).
+- Home lists all players in seed order of their entries (best seed first), numbered 1 to n, **without showing seed numbers**: player name on one side, a mystery icon on the other.
+- An entry is revealed to everyone when it goes out (loses a matchup other than the third-place playoff) or wins the final; the row then shows the entry and how far it got. Undoing a stage hides a reveal it caused.
+- Enforced on the server: clients read only `mystery_board()`, which returns entry details just for the caller's own row and revealed rows. Brackets locked before this feature can be dealt from Admin → Stage control.
+
 ## 10. Champion and podium
 
 - When the final stage closes, show a **champion screen**: the winner presented as a full broadcast title card, a **podium** (1st champion, 2nd final loser, 3rd third-place playoff winner), and the champion's path.
@@ -230,9 +236,9 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### Motifs (direction F layouts in direction D colours)
 - Straight-edged italic tabs for eyebrows, statuses and section labels (no skew).
-- White **title plates** with an angled right edge; the main call to action is an orange bar with the same angled edge.
+- Page titles (option G4, "overlaps + shadow"): a white angled **title plate on an offset orange box**, the eyebrow tab overlapping its top edge and an optional yellow caption overlapping its bottom edge. The main call to action is an orange angled bar on a **yellow offset box**.
 - Panels with a bright-navy header strip (italic caps title) over a navy body.
-- Top crawl: pinned LIVE (red) or LATEST (orange) tab, teleprinter feed. Bottom crawl under the tab bar: pinned white "R32 RESULTS" tab with the latest round's results.
+- Crawls (option G6, "split"): the top news ticker is an **orange** bar with navy teleprinter text and a navy LIVE/LATEST tab; the results crawl under the tab bar is a **yellow** bar with navy text and a navy "R32 RESULTS" tab in yellow.
 - **Every matchup sits in its own "MATCH n" box**: header strip with LIVE / LEVEL / FT / COIN TOSS / ADMIN status, then two rows (seed, image, name, white score box). Your pick and the winner fill orange; a level score turns the boxes yellow.
 - Home has a "Latest scores" results panel; Stats uses a classified-results list for upsets and a league table for total votes.
 - Coin-toss and admin-decision tags use the same tab style.
