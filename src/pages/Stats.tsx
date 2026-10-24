@@ -23,11 +23,14 @@ import {
 } from '../lib/stats'
 import { supabase } from '../lib/supabase'
 
-/** Broadcast segment tag under the title. */
+/** Segment banner under the title: same shape and yellow offset box as the Home next-action bar. */
 function SeanZone() {
   return (
-    <div className="-mt-3 mb-5 w-fit bg-orange px-3 py-1">
-      <p className="font-display text-lg font-extrabold text-navy-950 uppercase italic">The Sean Zone</p>
+    <div className="relative -mt-2 mr-[6px] mb-6 w-fit">
+      <div aria-hidden className="plate absolute inset-0 translate-x-[6px] translate-y-[6px] bg-yellow" />
+      <p className="plate relative flex min-h-12 items-center bg-orange pr-8 pl-4 font-display text-[22px] leading-tight font-extrabold text-navy-950 uppercase italic">
+        The Sean Zone
+      </p>
     </div>
   )
 }

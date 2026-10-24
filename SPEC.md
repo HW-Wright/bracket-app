@@ -235,9 +235,9 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
 ### Motifs (direction F layouts in direction D colours)
-- Straight-edged italic tabs for eyebrows, statuses and section labels (no skew). **Title and label tabs are always orange** (incl. The Sean Zone); red is kept for warnings (cut line, SHOCK, errors) and the LIVE dot.
+- Straight-edged italic tabs for eyebrows, statuses and section labels (no skew). **Title and label tabs are always orange**; The Sean Zone banner uses the next-action bar's shape (orange angled bar on a yellow offset box); red is kept for warnings (cut line, SHOCK, errors) and the LIVE dot.
 - The page declares `color-scheme: dark` (meta + CSS) so browsers' forced dark modes don't repaint it.
-- Page titles (option G4, "overlaps + shadow"): a **dark grey (#262a33) angled title plate with white text on an offset orange box**, the eyebrow tab overlapping its top edge and an optional yellow caption overlapping its bottom edge. The main call to action is an orange angled bar on a **yellow offset box**.
+- Page titles (option G4, "overlaps + shadow"): a **near-black (#1b1b1b) angled title plate with white text on an offset orange box**, the eyebrow tab overlapping its top edge and an optional yellow caption overlapping its bottom edge. The main call to action is an orange angled bar on a **yellow offset box**.
 - Panels with a bright-navy header strip (italic caps title) over a navy body.
 - Crawls (option G6, "split"): the top news ticker is an **orange** bar with **white** teleprinter text (Harry's choice; 2.6:1, below AA, with a faint navy text edge) and a navy LIVE/LATEST tab; the results crawl under the tab bar is a **yellow** bar with navy text and a navy "R32 RESULTS" tab in yellow.
 - **Every matchup sits in its own "MATCH n" box**: header strip with LIVE / LEVEL / FT / COIN TOSS / ADMIN status, then two rows (seed, image, name, white score box). Your pick and the winner fill orange; a level score turns the boxes yellow.

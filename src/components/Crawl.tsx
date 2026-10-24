@@ -35,7 +35,7 @@ export default function Crawl({
       {feed.map((item, i) => (
         <span key={i} className="flex items-center">
           {item}
-          <span className="px-2.5 opacity-45" aria-hidden>
+          <span className="px-2.5" aria-hidden>
             ●
           </span>
         </span>
