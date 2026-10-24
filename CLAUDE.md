@@ -28,7 +28,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 ## Brackets & nominations
 - One active bracket (`archived_at is null`, enforced by a unique index). Phases: draft -> nominations -> review -> live -> complete.
 - Phase moves via admin RPCs (`create_bracket`, `set_bracket_phase`, ...); `require_admin()` guards them.
-- Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always, everyone's once phase is past `nominations`. Blind applies to the admin too.
+- Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always; the admin always (Harry's choice); everyone once phase is past `nominations`. Client code must filter by `user_id` when it wants "my" nominations.
 - `normaliseEntry()` / `entryKey()` in `src/lib/normalise.ts`: comparison forms (key = normalised with spaces removed). Phase 4 needs a SQL twin.
 - Harry's decision: exact `entryKey` matches auto-combine at close (splittable); fuzzy matches are suggestions only. See SPEC §5.2.
 - A list counts only when complete: exactly 15, no repeated `entry_key` (`nomination_list_status()`, mirrored by `listStatus()` in TS). Incomplete lists are kept but excluded from seeding.
@@ -66,7 +66,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Client env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (public). `SUPABASE_SECRET_KEY` only in gitignored `.env` and function secrets. Never commit `.env` or `users.local.json`.
 - GitHub Actions reads the public values from repo **variables** (not secrets) of the same names.
 - Commit after each build phase, with tests passing.
-- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, white `plate` title plates, panels with navy-700 header strips. Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
+- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, DotGothic16 dot-matrix crawl text, IBM Plex Mono classified results, straight `Badge` tabs, white `plate` title plates, panels with navy-700 header strips. Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
 
 ## Status
 Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 done (6 stages, one per round). Phase 6 built; next Phase 7 (design polish) and 8 (dry run).

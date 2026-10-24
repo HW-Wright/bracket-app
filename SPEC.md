@@ -66,7 +66,7 @@ The home screen is phase-aware and always shows the single most relevant action 
 - Users can save, edit, reorder and delete their list freely until Harry closes nominations.
 - Reordering must be easy on a phone: drag handles **and** up/down buttons.
 - Flag clearly if a user enters something that normalises to the same text as another of their own entries; an exact repeat blocks the list from counting as complete.
-- **Blind until close:** a user can only see their own nominations while nominations are open. **Enforce this with RLS**, not just the UI.
+- **Blind until close:** a user can only see their own nominations while nominations are open. **Enforce this with RLS**, not just the UI. **Exception (Harry, 2026-10-24): the admin can see everyone's lists, drafts included, while open** (Admin → View everyone's nominations).
 - While open, everyone can see a progress count only, e.g. "5 of 8 have submitted" (no content, no names). **Harry's admin panel also shows each person's status** (e.g. "Joe 15/15 ✓", "Sean 9/15"), never the content. The close confirmation names anyone incomplete.
 - **After close:** everyone can see all nominations, grouped by user with ranks, in a section at the bottom of the nominations page.
 
@@ -225,7 +225,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### Typography (direction F format, adopted 2026-10-24)
 - Headlines, buttons and tabs: **Roboto Condensed** 800 italic caps. Body and controls: Roboto Condensed 500–700.
-- Teleprinter text (both crawls, classified results): **IBM Plex Mono** 600 caps in amber.
+- Scrolling text in both crawls: **DotGothic16** dot-matrix caps in amber (old-school LED, Harry 2026-10-24). Classified results: **IBM Plex Mono** 600 caps.
 - Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
 ### Motifs (direction F layouts in direction D colours)

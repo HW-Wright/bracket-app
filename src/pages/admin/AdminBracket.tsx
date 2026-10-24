@@ -5,6 +5,7 @@ import { useProgress } from '../../bracket/useProgress'
 import { Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
 import { IMAGE_BUCKET } from '../../lib/image'
 import { supabase } from '../../lib/supabase'
+import { AllNominations, type NominationRow } from '../nominate/Nominate'
 
 interface UserStatus {
   user_id: string
@@ -45,6 +46,33 @@ function StatusList({ rows }: { rows: UserStatus[] }) {
         </li>
       ))}
     </ul>
+  )
+}
+
+/** Admin only: everyone's lists (drafts included) while nominations are open. */
+function OpenNominations({ bracketId }: { bracketId: string }) {
+  const [rows, setRows] = useState<NominationRow[] | null>(null)
+  const load = useCallback(async () => {
+    const { data } = await supabase
+      .from('nominations')
+      .select('user_id, rank, text, profiles(display_name)')
+      .eq('bracket_id', bracketId)
+      .order('rank')
+    setRows((data as unknown as NominationRow[]) ?? [])
+  }, [bracketId])
+  return (
+    <details className="border border-line bg-navy-900" onToggle={(e) => (e.currentTarget as HTMLDetailsElement).open && load()}>
+      <summary className="flex min-h-11 cursor-pointer items-center px-3 text-base font-extrabold tracking-wide uppercase italic">
+        View everyone's nominations
+      </summary>
+      <div className="flex flex-col gap-2 p-3">
+        <p className="text-sm font-semibold text-muted">Only you can see these while nominations are open. Lists are live drafts and may still change.</p>
+        {rows === null ? <p className="text-base text-muted">Loading…</p> : <AllNominations rows={rows} open title="Live lists" />}
+        <button type="button" onClick={load} className="min-h-11 self-start text-base font-bold text-orange uppercase">
+          Refresh
+        </button>
+      </div>
+    </details>
   )
 }
 
@@ -213,6 +241,7 @@ export default function AdminBracket() {
               </button>
             </div>
             {status && <StatusList rows={status} />}
+            <OpenNominations bracketId={bracket.id} />
             <Button
               disabled={busy}
               onClick={() =>

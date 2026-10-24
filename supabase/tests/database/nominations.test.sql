@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(25);
 
 -- Fixtures
 insert into auth.users (id, email, aud, role) values
@@ -74,7 +74,12 @@ select is(
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1');
 select is(
   (select count(*)::int from public.nominations where user_id <> auth.uid()),
-  0, 'while open, even the admin cannot read others'' nominations');
+  2, 'while open, the admin can read everyone''s nominations (Joe''s 2)');
+
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000c3');
+select is(
+  (select count(*)::int from public.nominations where user_id <> auth.uid()),
+  0, 'while open, other non-admins still cannot read anyone else''s');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000c3');
 select results_eq(

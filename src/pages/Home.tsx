@@ -33,17 +33,20 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 function NominationsOpen({ bracket }: { bracket: Bracket }) {
+  const { profile } = useAuth()
   const { progress } = useProgress(bracket.id)
   const [mine, setMine] = useState<ListStatus | null>(null)
 
   useEffect(() => {
-    // RLS: while open this returns only the caller's own rows.
+    if (!profile) return
+    // Filter to the caller explicitly: the admin can read everyone's lists while open.
     supabase
       .from('nominations')
       .select('text')
       .eq('bracket_id', bracket.id)
+      .eq('user_id', profile.id)
       .then(({ data }) => setMine(listStatus((data ?? []).map((r) => r.text))))
-  }, [bracket.id])
+  }, [bracket.id, profile])
 
   const label = !mine || mine.count === 0
     ? 'Submit your nominations'

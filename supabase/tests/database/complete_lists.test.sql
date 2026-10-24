@@ -63,8 +63,8 @@ select results_eq(
   $$values ('Harry'::text, 15, false, true), ('Joe', 15, true, false), ('Sean', 9, false, false)$$,
   'admin sees each user''s count, repeats and completeness');
 select is(
-  (select count(*)::int from public.nominations where user_id <> auth.uid()), 0,
-  'admin status does not reveal content: still cannot read others'' rows');
+  (select count(*)::int from public.nominations where user_id <> auth.uid()), 24,
+  'admin can read others'' lists while open (Joe 15 + Sean 9)');
 
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b2');
 select lives_ok($$select public.save_nominations('00000000-0000-0000-0000-00000000bb01',

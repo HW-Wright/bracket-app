@@ -22,7 +22,8 @@ export function ProgressLine({ submitted, total }: { submitted: number; total: n
   )
 }
 
-export function AllNominations({ rows }: { rows: NominationRow[] }) {
+/** Everyone's lists grouped by person. `open`: nominations still open (admin view), so incomplete = draft. */
+export function AllNominations({ rows, open = false, title = "Everyone's nominations" }: { rows: NominationRow[]; open?: boolean; title?: string }) {
   const byUser = new Map<string, { name: string; items: NominationRow[] }>()
   for (const r of rows) {
     const group = byUser.get(r.user_id) ?? { name: r.profiles?.display_name ?? 'Unknown', items: [] }
@@ -32,8 +33,8 @@ export function AllNominations({ rows }: { rows: NominationRow[] }) {
   const groups = [...byUser.values()].sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <section className="mt-10">
-      <Badge className="mb-3 ml-1">Everyone's nominations</Badge>
+    <section className={open ? '' : 'mt-10'}>
+      <Badge className="mb-3">{title}</Badge>
       {groups.length === 0 ? (
         <p className="text-base text-muted">Nobody nominated anything.</p>
       ) : (
@@ -45,7 +46,7 @@ export function AllNominations({ rows }: { rows: NominationRow[] }) {
                 {listStatus(g.items.map((n) => n.text)).complete ? (
                   <span className="label-caps">{g.items.length} picks</span>
                 ) : (
-                  <span className="label-caps text-danger">Incomplete · not counted</span>
+                  <span className={`label-caps ${open ? '' : 'text-danger'}`}>{open ? `Draft · ${g.items.length}/15` : 'Incomplete · not counted'}</span>
                 )}
               </summary>
               <ol className="px-3 py-2">
