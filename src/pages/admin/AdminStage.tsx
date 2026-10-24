@@ -172,7 +172,7 @@ export default function AdminStage() {
   const rows = open.matchups.map((m) => ({ m, a: open.tallies[m.id]?.votes_a ?? 0, b: open.tallies[m.id]?.votes_b ?? 0 }))
 
   return (
-    <Card title="Stage control" aside={open.stage ? <Badge tone="live">Stage {open.stage.number}/{open.stageCount}</Badge> : <Badge tone="yellow">Final</Badge>}>
+    <Card title="Stage control" aside={open.stage ? <Badge>Stage {open.stage.number}/{open.stageCount}</Badge> : <Badge>Final</Badge>}>
       <div className="flex flex-col gap-3">
         {open.stage ? (
           <>

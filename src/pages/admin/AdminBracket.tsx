@@ -180,7 +180,7 @@ export default function AdminBracket() {
   return (
     <Card
       title="Current bracket"
-      aside={<Badge tone={bracket.phase === 'nominations' || bracket.phase === 'live' ? 'live' : 'yellow'}>{bracket.phase}</Badge>}
+      aside={<Badge>{bracket.phase}</Badge>}
     >
       <div className="mb-4 flex items-start justify-between gap-3">
         <p className="font-display text-2xl leading-tight uppercase">{bracket.title}</p>

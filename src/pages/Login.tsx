@@ -20,10 +20,10 @@ export default function Login() {
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-8 px-4">
       <div className="relative mt-3 mr-2 mb-4 w-fit">
         <div aria-hidden className="plate absolute inset-0 translate-x-[7px] translate-y-[7px] bg-orange" />
-        <Badge tone="live" className="absolute -top-3 left-2.5 z-[2]">
+        <Badge className="absolute -top-3 left-2.5 z-[2]">
           Members only
         </Badge>
-        <div className="plate relative bg-white pt-4 pr-12 pb-5 pl-3.5 text-navy-950">
+        <div className="plate relative bg-plate pt-4 pr-12 pb-5 pl-3.5 text-white">
           <h1 className="font-display text-[40px] leading-[0.95] font-extrabold uppercase italic">
             The Gang <span className="block font-semibold">Does a Bracket</span>
           </h1>

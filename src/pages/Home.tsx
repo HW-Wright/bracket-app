@@ -135,7 +135,7 @@ export default function Home() {
 
   return (
     <>
-      <PageTitle eyebrow={eyebrow} live={bracket.phase === 'live' || bracket.phase === 'nominations'}>
+      <PageTitle eyebrow={eyebrow}>
         {bracket.title}
       </PageTitle>
       {bracket.description && <p className="-mt-2 mb-5 text-base text-muted">{bracket.description}</p>}

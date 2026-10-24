@@ -26,7 +26,7 @@ import { supabase } from '../lib/supabase'
 /** Broadcast segment tag under the title. */
 function SeanZone() {
   return (
-    <div className="-mt-3 mb-5 w-fit bg-yellow px-3 py-1">
+    <div className="-mt-3 mb-5 w-fit bg-orange px-3 py-1">
       <p className="font-display text-lg font-extrabold text-navy-950 uppercase italic">The Sean Zone</p>
     </div>
   )
@@ -275,7 +275,7 @@ export default function Stats() {
           )}
         </Section>
 
-        <Section id="upsets" title="Classified results · upsets" blurb="Lower seeds beating higher seeds, biggest gap first (round shown on each entry page)." aside={<Badge tone="live">{ups.length}</Badge>}>
+        <Section id="upsets" title="Classified results · upsets" blurb="Lower seeds beating higher seeds, biggest gap first (round shown on each entry page)." aside={<Badge>{ups.length}</Badge>}>
           {ups.length === 0 ? (
             <Empty>No upsets yet: every higher seed has won so far.</Empty>
           ) : (

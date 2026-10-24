@@ -55,9 +55,7 @@ function ChampionCard({ data }: { data: BracketData }) {
   return (
     <section className="mb-8 flex flex-col gap-4" aria-label="Champion">
       <div className="relative overflow-hidden border-2 border-orange bg-navy-800 px-4 pt-5 pb-6 text-center shadow-[6px_6px_0_var(--color-yellow)]">
-        <Badge tone="live" className="mb-3">
-          Champion
-        </Badge>
+        <Badge className="mb-3">Champion</Badge>
         <div className="mx-auto mb-3 w-fit motion-safe:animate-[champ_700ms_ease-out_both]">
           <EntryThumb name={p.first.name} path={p.first.image_path} size={120} />
         </div>

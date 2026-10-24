@@ -105,7 +105,7 @@ export default function EntryPage() {
       <div className="mb-5 flex items-center gap-4">
         <EntryThumb name={entry.name} path={entry.image_path} size={96} />
         <div className="min-w-0">
-          {data && <Badge tone={place === 'Champion' ? 'live' : 'orange'}>{statusText}</Badge>}
+          {data && <Badge>{statusText}</Badge>}
           <h1 className="mt-1 font-display text-3xl leading-tight uppercase">{entry.name}</h1>
           {data && (
             <Link to={entry.bracket_id === active?.id ? '/bracket' : `/archive/${entry.bracket_id}`} className="text-base font-semibold text-muted">

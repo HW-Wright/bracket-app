@@ -81,29 +81,27 @@ export function Card({
 }
 
 /**
- * Page title: white plate on an offset orange box, the eyebrow tab overlapping its top edge and an optional
+ * Page title: dark grey plate on an offset orange box, the eyebrow tab overlapping its top edge and an optional
  * yellow caption overlapping its bottom edge (direction G4, "overlaps + shadow").
  */
 export function PageTitle({
   eyebrow,
   sub,
-  live = false,
   children,
 }: {
   eyebrow?: string
   sub?: string
-  live?: boolean
   children: ReactNode
 }) {
   return (
     <header className={`relative mr-2 mb-8 w-fit max-w-[calc(100%-0.5rem)] ${eyebrow ? 'mt-3' : ''}`}>
       <div aria-hidden className="plate absolute inset-0 translate-x-[7px] translate-y-[7px] bg-orange" />
       {eyebrow && (
-        <Badge tone={live ? 'live' : 'orange'} className="absolute -top-3 left-2.5 z-[2]">
+        <Badge className="absolute -top-3 left-2.5 z-[2]">
           {eyebrow}
         </Badge>
       )}
-      <div className={`plate relative bg-white pr-10 pl-3.5 text-navy-950 ${eyebrow ? 'pt-4' : 'pt-2.5'} ${sub ? 'pb-4' : 'pb-2.5'}`}>
+      <div className={`plate relative bg-plate pr-10 pl-3.5 text-white ${eyebrow ? 'pt-4' : 'pt-2.5'} ${sub ? 'pb-4' : 'pb-2.5'}`}>
         <h1 className="font-display text-[30px] leading-[1.05] font-extrabold uppercase italic">{children}</h1>
       </div>
       {sub && (

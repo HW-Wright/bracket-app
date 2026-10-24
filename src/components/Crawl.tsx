@@ -8,7 +8,8 @@ import type { ReactNode } from 'react'
  * constant per character. Static under prefers-reduced-motion.
  */
 const TONES = {
-  orange: 'bg-orange text-navy-950',
+  // White on orange is Harry's choice (2.6:1, below AA); the faint navy edge helps it read.
+  orange: 'bg-orange text-white [text-shadow:0_1px_0_rgb(10_22_64/0.55)]',
   yellow: 'bg-yellow text-navy-950',
 } as const
 

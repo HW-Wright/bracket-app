@@ -31,7 +31,7 @@ export default function Vote() {
   return (
     <>
       <div className="flex items-start justify-between gap-3">
-        <PageTitle eyebrow={`Stage ${stage.number}${sectionLabel ? ` · ${sectionLabel}` : ''}`} sub={`${matchups.length} games`} live>
+        <PageTitle eyebrow={`Stage ${stage.number}${sectionLabel ? ` · ${sectionLabel}` : ''}`} sub={`${matchups.length} games`}>
           {ROUND_NAMES[stage.round]}
         </PageTitle>
         <div className="led mt-3 shrink-0 border border-line px-2.5 py-1 text-center" role="status">
