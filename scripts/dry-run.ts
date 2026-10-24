@@ -69,7 +69,7 @@ async function main() {
   await wipe()
 
   // 1. Eight users; the first is admin. All past the forced password change.
-  const names = ['Harry', 'Kier', 'Ollie', 'Reiss', 'Joe', 'Sean', 'Connor', 'Hutton']
+  const names = ['Harry', 'Kier', 'Ollie', 'Reiss', 'Joe', 'Sean', 'Conor', 'Hutton']
   const clients: SupabaseClient[] = []
   for (const [i, display] of names.entries()) {
     const username = `${PREFIX}-${display.toLowerCase()}`

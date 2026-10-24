@@ -9,7 +9,7 @@ describe('username mapping', () => {
   })
 
   it('accepts all eight gang usernames', () => {
-    for (const u of ['harry', 'kier', 'ollie', 'reiss', 'joe', 'sean', 'connor', 'hutton']) {
+    for (const u of ['harry', 'kier', 'ollie', 'reiss', 'joe', 'sean', 'conor', 'hutton']) {
       expect(isValidUsername(u)).toBe(true)
     }
   })

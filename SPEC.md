@@ -33,7 +33,7 @@ A private, mobile-first web app where eight friends nominate entries on a changi
 
 ## 2. Users and authentication
 
-- **Users (8):** Harry, Kier, Ollie, Reiss, Joe, Sean, Connor, Hutton.
+- **Users (8):** Harry, Kier, Ollie, Reiss, Joe, Sean, Conor, Hutton.
 - **Harry is the only admin** and also nominates and votes exactly like everyone else.
 - **No public sign-up.** Accounts are created by a script and by Harry in the admin panel only.
 - **Login is username + password.** Username is case-insensitive (e.g. `joe`, `Joe`). Supabase Auth needs an email, so map each username to a synthetic internal email on a placeholder domain. Users never see it, and no emails are ever sent. Disable email confirmation. Verify the placeholder domain is accepted by Supabase Auth when creating users via the admin API.
