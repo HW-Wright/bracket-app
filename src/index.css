@@ -16,6 +16,7 @@
 
   --color-muted: #aab6e0;
   --color-live: #d62b31; /* LIVE badge ground (white text) */
+  --color-live-dot: #ff1a1a; /* LIVE light: full-strength red, never faded */
   --color-danger: #ff6b6b; /* red text on navy */
   --color-ok: #7ee08a;
 
@@ -86,6 +87,25 @@ html[data-keyboard] .unstick-with-keyboard {
 }
 
 /* LED news crawl in the header (see Ticker in Layout.tsx): moves left by one of its two identical copies. */
+/* LIVE light: the dot stays solid; a red halo pulses out from behind its white rim. */
+.live-dot {
+  box-shadow: 0 0 0 1.5px #fff;
+  animation: live-pulse 1.6s ease-out infinite;
+}
+@keyframes live-pulse {
+  from {
+    box-shadow: 0 0 0 1.5px #fff, 0 0 0 1.5px rgb(255 26 26 / 0.9);
+  }
+  to {
+    box-shadow: 0 0 0 1.5px #fff, 0 0 0 7px rgb(255 26 26 / 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
+}
+
 @keyframes ticker {
   from {
     transform: translateX(0);

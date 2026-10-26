@@ -49,6 +49,11 @@ export function Badge({
   )
 }
 
+/** Pulsing LIVE light: solid bold red with a white rim so it stands out on navy and on orange alike. */
+export function LiveDot({ className = '' }: { className?: string }) {
+  return <span aria-hidden className={`live-dot inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-live-dot ${className}`} />
+}
+
 /** A number on a dark inset, amber digits. */
 export function Led({ children, className = '' }: { children: ReactNode; className?: string }) {
   // inline-flex + centring so callers can size the box (h-11 w-11 …) and the digits stay centred.

@@ -6,6 +6,7 @@ import { useProgress } from '../bracket/useProgress'
 import { useLatestResults } from '../bracket/useLatestResults'
 import { useKeyboardAware } from '../lib/useKeyboardAware'
 import Crawl from './Crawl'
+import { LiveDot } from './ui'
 
 const icons: Record<string, string> = {
   home: 'M4 11 12 4l8 7v9h-5v-6H9v6H4z',
@@ -64,7 +65,7 @@ function Ticker() {
       items={items}
       pinned={
         <span className="flex items-center gap-1.5 bg-navy-950 px-2.5 font-sans text-[13px] font-extrabold tracking-wider text-white italic">
-          {live && <span className="h-2 w-2 rounded-full bg-danger motion-safe:animate-pulse" aria-hidden />}
+          {live && <LiveDot />}
           {live ? 'LIVE' : 'LATEST'}
         </span>
       }

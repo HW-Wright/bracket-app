@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import type { BracketData, VoteRow } from '../../bracket/useBracketData'
 import type { EntryRef, Matchup } from '../../bracket/useStage'
 import EntryThumb from '../../components/EntryThumb'
 import MatchupCard from '../../components/MatchupCard'
-import { Badge, Card } from '../../components/ui'
+import { Badge, Card, LiveDot } from '../../components/ui'
+import { closedRounds, WhoVotedRound } from '../../components/WhoVoted'
 import { ROUNDS } from '../../lib/bracket'
 import { entryPath, isThirdPlace, podium, winnerOf } from '../../lib/stats'
 
@@ -140,7 +141,13 @@ export default function BracketView({ data }: { data: BracketData }) {
   const roundsWithGames = ROUNDS.filter((r) => data.matchups.some((m) => m.round === r.round && (m.a || m.b)))
   const openRound = data.stages.find((s) => s.number === data.openStage)?.round
   const [round, setRound] = useState<number>(openRound ?? roundsWithGames.at(-1)?.round ?? 1)
-  const [view, setView] = useState<'list' | 'tree'>('tree')
+  const [params, setParams] = useSearchParams()
+  const view = (['tree', 'list', 'votes'] as const).find((v) => v === params.get('view')) ?? 'tree'
+  const setView = (v: typeof view) => setParams(v === 'tree' ? {} : { view: v }, { replace: true })
+  const voteRounds = closedRounds(data)
+  const [pickedVoteRound, setVoteRound] = useState<number>()
+  // Latest closed round unless one was picked (and is still closed after an undo).
+  const voteRound = pickedVoteRound && voteRounds.includes(pickedVoteRound) ? pickedVoteRound : voteRounds.at(-1)
 
   if (data.matchups.length === 0) {
     return (
@@ -158,21 +165,48 @@ export default function BracketView({ data }: { data: BracketData }) {
       {data.bracket.phase === 'complete' && <ChampionCard data={data} />}
 
       <div className="mb-3 flex gap-2">
-        {(['tree', 'list'] as const).map((v) => (
+        {(['tree', 'list', 'votes'] as const).map((v) => (
           <button
             key={v}
             type="button"
             onClick={() => setView(v)}
             aria-pressed={view === v}
-            className={`slant min-h-11 px-4 text-base font-extrabold tracking-wider uppercase ${view === v ? 'bg-white text-navy-950' : 'bg-navy-800 text-muted'}`}
+            className={`slant min-h-11 flex-1 px-2 text-base leading-tight font-extrabold tracking-wider uppercase ${view === v ? 'bg-white text-navy-950' : 'bg-navy-800 text-muted'}`}
           >
-            {v === 'list' ? 'Round by round' : 'Bracket tree'}
+            {{ tree: 'Tree', list: 'Rounds', votes: 'Who voted' }[v]}
           </button>
         ))}
       </div>
 
       {view === 'tree' ? (
         <Tree data={data} />
+      ) : view === 'votes' ? (
+        voteRounds.length === 0 || !voteRound ? (
+          <Card>
+            <p className="text-base text-muted">Everyone's votes appear here when Harry closes the first round.</p>
+          </Card>
+        ) : (
+          <>
+            {voteRounds.length > 1 && (
+              <div role="tablist" className="-mx-4 mb-4 flex gap-1 overflow-x-auto px-4 pb-1">
+                {voteRounds.map((r) => (
+                  <button
+                    key={r}
+                    role="tab"
+                    aria-selected={voteRound === r}
+                    onClick={() => setVoteRound(r)}
+                    className={`slant min-h-11 shrink-0 px-3 text-base font-extrabold tracking-wider uppercase ${voteRound === r ? 'bg-orange text-navy-950' : 'bg-navy-800 text-muted'}`}
+                  >
+                    {r === 6 ? 'Final' : ROUNDS[r - 1].name.replace('Round of ', 'R')}
+                  </button>
+                ))}
+              </div>
+            )}
+            <Card title={`Who voted for who · ${ROUNDS[voteRound - 1].name}`}>
+              <WhoVotedRound key={voteRound} data={data} round={voteRound} initial="match" />
+            </Card>
+          </>
+        )
       ) : (
         <>
           <div role="tablist" className="-mx-4 mb-4 flex gap-1 overflow-x-auto px-4 pb-1">
@@ -185,7 +219,7 @@ export default function BracketView({ data }: { data: BracketData }) {
                 className={`slant min-h-11 shrink-0 px-3 text-base font-extrabold tracking-wider uppercase ${round === r.round ? 'bg-orange text-navy-950' : 'bg-navy-800 text-muted'}`}
               >
                 {r.round === 6 ? 'Final' : r.name.replace('Round of ', 'R')}
-                {r.round === openRound && <span className="ml-1.5 text-danger">●</span>}
+                {r.round === openRound && <LiveDot className="ml-2 align-middle" />}
               </button>
             ))}
           </div>

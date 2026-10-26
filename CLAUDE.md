@@ -56,6 +56,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 ## History, stats, archive (Phase 6)
 - `useBracketData(bracketId)` loads one bracket (active or archived): stages, matchups, tallies, visible votes, names; tallies live.
 - Pure derivations in `src/lib/stats.ts` (upsets, voteTotals, entryPath, podium, pickStatus) with Vitest coverage.
+- Who voted for who: `WhoVoted` (Home, latest closed round) / `WhoVotedRound` (Bracket `?view=votes`), by player via `playerPicks()` or by match.
 - Screens: `/bracket` (round tabs + tree, champion card when complete), `/entry/:id`, `/stats`, `/archive`, `/archive/:id`. `MatchupCard` is shared (vote mode via `onPick`, read-only via `link`).
 - `npm run test:queries`: PostgREST query smoke test (local).
 - `npm run dry-run [-- --stages=N | --keep | --wipe]`: full simulated bracket on the local stack (8 fake users).
@@ -70,7 +71,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Client env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (public). `SUPABASE_SECRET_KEY` only in gitignored `.env` and function secrets. Never commit `.env` or `users.local.json`.
 - GitHub Actions reads the public values from repo **variables** (not secrets) of the same names.
 - Commit after each build phase, with tests passing.
-- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, `PageTitle` (plate on offset orange box with overlapping tabs) and `ActionLink` (orange bar on yellow offset), panels with navy-700 header strips, `Crawl` tone orange (top) / yellow (results). Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
+- Design (SPEC §13): direction D colours (navy, court orange, yellow, amber, red LIVE) with direction F layouts/type: Roboto Condensed italic caps, IBM Plex Mono teleprinter crawls, straight `Badge` tabs, `PageTitle` (plate on offset orange box with overlapping tabs) and `ActionLink` (orange bar on yellow offset), panels with navy-700 header strips, `Crawl` tone orange (top) / yellow (results). LIVE indicators use `LiveDot` (bold red, white rim, halo pulse), never a faded or pastel red. Every matchup is a "MATCH n" box (`MatchupCard`). Tokens/utilities in `src/index.css`; shared pieces in `src/components/ui.tsx`. No NCAA or broadcaster branding.
 
 ## Status
 Phases 1–3 done, design direction D applied. Phase 4 done. Phase 5 done (6 stages, one per round). Phase 6 built; next Phase 7 (design polish) and 8 (dry run).

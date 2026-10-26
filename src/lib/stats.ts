@@ -352,3 +352,38 @@ export function bracketSummary(matchups: Matchup[], tallies: Record<string, Tall
     adminDecisions: done.filter((m) => m.decided_by === 'admin').length,
   }
 }
+
+// ---------------------------------------------------------------------------
+// Who voted for who (closed stages only; RLS hides the open stage's votes).
+
+export interface PlayerPick {
+  matchup: Matchup
+  picked: EntryRef
+  /** Whether the pick went through. Null while the game is undecided. */
+  won: boolean | null
+}
+
+export interface PlayerRound {
+  userId: string
+  picks: PlayerPick[]
+  /** Picks that went through. */
+  correct: number
+}
+
+/** Each player's picks in the given games (in game order), players sorted by name. Players with no votes are left out. */
+export function playerPicks(matchups: Matchup[], votes: Vote[], names: Record<string, string>): PlayerRound[] {
+  const byPlayer = new Map<string, PlayerPick[]>()
+  for (const mu of matchups) {
+    for (const vote of votes) {
+      if (vote.matchup_id !== mu.id) continue
+      const picked = vote.entry_id === mu.a?.id ? mu.a : vote.entry_id === mu.b?.id ? mu.b : null
+      if (!picked) continue
+      const list = byPlayer.get(vote.user_id) ?? []
+      list.push({ matchup: mu, picked, won: mu.winner ? mu.winner === picked.id : null })
+      byPlayer.set(vote.user_id, list)
+    }
+  }
+  return [...byPlayer]
+    .map(([userId, picks]) => ({ userId, picks, correct: picks.filter((p) => p.won).length }))
+    .sort((x, y) => (names[x.userId] ?? '').localeCompare(names[y.userId] ?? ''))
+}

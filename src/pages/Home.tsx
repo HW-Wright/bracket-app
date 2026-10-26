@@ -6,6 +6,7 @@ import { useProgress } from '../bracket/useProgress'
 import { useOpenStage } from '../bracket/useStage'
 import MysterySeeds from '../components/MysterySeeds'
 import PicksAlive from '../components/PicksAlive'
+import WhoVoted from '../components/WhoVoted'
 import { ActionLink, Card, Led, PageTitle } from '../components/ui'
 import { listStatus, MAX_NOMINATIONS, type ListStatus } from '../lib/normalise'
 import { supabase } from '../lib/supabase'
@@ -158,6 +159,7 @@ export default function Home() {
       {bracket.phase === 'complete' && <Action to="/bracket">See the champion</Action>}
       {(bracket.phase === 'live' || bracket.phase === 'complete') && (
         <div className="mt-6 flex flex-col gap-6">
+          <WhoVoted bracketId={bracket.id} />
           <MysterySeeds bracketId={bracket.id} />
           <PicksAlive bracketId={bracket.id} />
         </div>

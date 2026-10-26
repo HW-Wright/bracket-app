@@ -158,6 +158,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 - **Bracket history:** every closed stage, viewable at any time. Mobile-friendly: round-by-round lists with an optional horizontally scrollable bracket tree for completed rounds.
 - Each closed matchup shows final tallies, who voted for which entry, and any coin-toss or admin badge.
+- **Who voted for who** (Harry, 2026-10-27): voters must be easy to find, not only via an entry's path. Home shows a "Who voted for who" panel for the most recently closed round, **by player** (each person's hit rate, tap to see their picks with ✓/✗; your own row starts open) or **by match** (every game with name chips under each side, yours in orange). The Bracket page has a third view, **Who voted**, with tabs for every closed round (`/bracket?view=votes`). Open-stage votes stay hidden (RLS).
 - **Entry page:** tap any entry anywhere to see its seed, points, who nominated it and at what rank, and its full path through the bracket (each opponent, tally, voters, result). People enjoy following a seed's run, so make this page good.
 
 ---
@@ -236,7 +237,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
 ### Motifs (direction F layouts in direction D colours)
-- Straight-edged italic tabs for eyebrows, statuses and section labels (no skew). **Title and label tabs are always orange**; The Sean Zone banner uses the next-action bar's shape (orange angled bar on a yellow offset box); red is kept for warnings (cut line, SHOCK, errors) and the LIVE dot.
+- Straight-edged italic tabs for eyebrows, statuses and section labels (no skew). **Title and label tabs are always orange**; The Sean Zone banner uses the next-action bar's shape (orange angled bar on a yellow offset box); red is kept for warnings (cut line, SHOCK, errors) and the LIVE dot. The LIVE dot (`LiveDot`) is a solid full-strength red (`#ff1a1a`) with a white rim, and its pulse is a halo, never a fade, so it stays bold on navy and on orange (Harry, 2026-10-27).
 - The page declares `color-scheme: dark` (meta + CSS) so browsers' forced dark modes don't repaint it.
 - Page titles (option G4, "overlaps + shadow"): a **near-black (#1b1b1b) angled title plate with white text on an offset orange box**, the eyebrow tab overlapping its top edge and an optional yellow caption overlapping its bottom edge. The main call to action is an orange angled bar on a **yellow offset box**.
 - Panels with a bright-navy header strip (italic caps title) over a navy body.
