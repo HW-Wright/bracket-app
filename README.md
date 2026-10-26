@@ -106,6 +106,11 @@ Everything is in the **Admin** tab (★). Only you see it.
 9. **Undo last advance** (type `UNDO`): reopens the stage you just closed and discards any votes already cast in the next one. Coin tosses are kept.
 10. **Override a result** (type `OVERRIDE`), for bugs only: shown publicly as an Admin decision. Only possible until the next matchup is decided.
 
+### Go back a step
+- **Live → Review:** Admin → Stage control → **Back to review (unlock seeding)…** (type `UNLOCK`). Keeps all review work (merges, removals, manual entries, images) so you can fix missed duplicates; discards the bracket, all votes so far, results and the mystery-seed deal (re-dealt when you lock again).
+- **A round:** Undo last advance (above). **Finished bracket:** Undo last advance reopens the final.
+- **Review → Nominations:** Reopen nominations (discards review work).
+
 ### Finish and start the next one
 11. After the final stage the champion screen appears on the **Bracket** tab and Home.
 12. Starting the next bracket automatically moves the finished one to the **Archive**.

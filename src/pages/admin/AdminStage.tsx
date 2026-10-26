@@ -157,6 +157,18 @@ export default function AdminStage() {
     await after()
   }
 
+  async function unlock() {
+    const { data: ts } = await supabase.from('matchup_tallies').select('votes_a, votes_b').eq('bracket_id', bracket!.id)
+    const votes = (ts ?? []).reduce((n, t) => n + t.votes_a + t.votes_b, 0)
+    const typed = prompt(
+      `Go back to review (unlock seeding)?\n\nYour merges, removals, manual entries and images are kept so you can fix duplicates and lock again.\n\nDiscarded: the bracket, ${votes} vote${votes === 1 ? '' : 's'} cast so far, any results, and the mystery-seed deal (it's re-dealt when you lock again).\n\nType UNLOCK to confirm:`,
+    )
+    if (typed === null) return
+    const { error } = await supabase.rpc('unlock_seeding', { p_bracket_id: bracket!.id, p_confirm: typed })
+    setError(rpcMessage(error))
+    await after()
+  }
+
   async function undo() {
     const warning =
       bracket!.phase === 'complete'
@@ -204,6 +216,11 @@ export default function AdminStage() {
             </Button>
             <Override key={`${lastClosed}-${open.stage?.number}`} bracketId={bracket.id} stageNumber={lastClosed} onDone={after} />
           </>
+        )}
+        {bracket.phase === 'live' && (
+          <Button variant="danger" onClick={unlock} className="mt-2">
+            Back to review (unlock seeding)…
+          </Button>
         )}
         <ErrorText>{error}</ErrorText>
       </div>

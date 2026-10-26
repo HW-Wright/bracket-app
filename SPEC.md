@@ -149,6 +149,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
   5. Fills next-round matchups once both feeder matchups are decided.
   6. Opens the next stage, or marks the bracket complete after the final stage.
 - **Undo last advance** (admin, for fixing mistakes): reverts the most recent push after a typed confirmation, warning that any votes cast in the newly opened stage will be discarded. Coin toss results already recorded are kept and reused if that matchup is still tied when re-closed, so a toss can never be rerolled.
+- **Unlock seeding** (admin, Harry 2026-10-26): take a live bracket back to review after a typed `UNLOCK`. Keeps all review work; discards the bracket, votes, results and the mystery-seed deal (re-dealt on the next lock). Together with undo and reopen, the admin can step back from any phase.
 - **Override a matchup result** (admin, bug fixing only): requires typed confirmation and is shown publicly with an "Admin decision" badge, so the bracket stays transparent.
 
 ---
