@@ -159,8 +159,8 @@ export default function Home() {
       {bracket.phase === 'complete' && <Action to="/bracket">See the champion</Action>}
       {(bracket.phase === 'live' || bracket.phase === 'complete') && (
         <div className="mt-6 flex flex-col gap-6">
-          <WhoVoted bracketId={bracket.id} />
           <MysterySeeds bracketId={bracket.id} />
+          <WhoVoted bracketId={bracket.id} />
           <PicksAlive bracketId={bracket.id} />
         </div>
       )}

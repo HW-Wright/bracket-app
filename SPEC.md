@@ -158,7 +158,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 - **Bracket history:** every closed stage, viewable at any time. Mobile-friendly: round-by-round lists with an optional horizontally scrollable bracket tree for completed rounds.
 - Each closed matchup shows final tallies, who voted for which entry, and any coin-toss or admin badge.
-- **Who voted for who** (Harry, 2026-10-27): voters must be easy to find, not only via an entry's path. Home shows a "Who voted for who" panel for the most recently closed round, **by player** (each person's hit rate, tap to see their picks with ✓/✗; your own row starts open) or **by match** (every game with name chips under each side, yours in orange). The Bracket page has a third view, **Who voted**, with tabs for every closed round (`/bracket?view=votes`). Open-stage votes stay hidden (RLS).
+- **Who voted for who** (Harry, 2026-10-27): voters must be easy to find, not only via an entry's path. Home shows a "Who voted for who" panel (below Mystery seeds) for the most recently closed round, **by player** (each person's hit rate, tap to see their picks with ✓/✗; your own row starts open) or **by match** (every game with name chips under each side, yours in orange). The Bracket page has a third view, **Who voted**, with tabs for every closed round (`/bracket?view=votes`). Open-stage votes stay hidden (RLS).
 - **Entry page:** tap any entry anywhere to see its seed, points, who nominated it and at what rank, and its full path through the bracket (each opponent, tally, voters, result). People enjoy following a seed's run, so make this page good.
 
 ---
