@@ -173,7 +173,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - **Kingmaker:** times someone's vote decided a game won by one vote (every winning voter in such a game counts).
 - **Consensus vs chaos:** seeded entries with 2+ nominators vs one-person picks vs manual fill-ins: count, still alive, average round reached, best run.
 - **Bracket summary:** total votes, games decided, unanimous results (2+ votes, all for the winner), coin tosses, upsets, admin decisions. Also shown on each archived bracket.
-- Voter-based stats use closed stages only (open-stage votes stay hidden). Each stat is its own titled panel, with a sticky jump menu at the top of the page. Added by Harry, 2026-10-23.
+- Voter-based stats use closed stages only (open-stage votes stay hidden). Each stat is its own titled panel, with a jump menu at the top showing every stat in wrapping rows. Added by Harry, 2026-10-23.
 - Lives on its own bottom-nav tab. Profile moves to an avatar button in the header to make room.
 
 ### 9.2 Home: your picks still alive

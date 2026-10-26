@@ -62,7 +62,7 @@ const SECTIONS = [
 
 function Section({ id, title, blurb, aside, children }: { id: string; title: string; blurb: string; aside?: ReactNode; children: ReactNode }) {
   return (
-    <section id={`stat-${id}`} className="scroll-mt-[calc(9rem+env(safe-area-inset-top))]">
+    <section id={`stat-${id}`} className="scroll-mt-[calc(6rem+env(safe-area-inset-top))]">
       <Card title={title} aside={aside}>
         <p className="-mt-1 mb-3 text-base text-muted">{blurb}</p>
         {children}
@@ -77,11 +77,8 @@ function JumpMenu() {
     document.getElementById(`stat-${id}`)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
   }
   return (
-    <nav
-      aria-label="Jump to a stat"
-      className="sticky top-[calc(78px+env(safe-area-inset-top))] z-[5] -mx-4 mb-5 border-b border-line bg-navy-950/95 px-4 py-2 backdrop-blur"
-    >
-      <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5">
+    <nav aria-label="Jump to a stat" className="mb-6">
+      <div className="flex flex-wrap gap-1.5">
         {SECTIONS.map(([id, label]) => (
           <button
             key={id}

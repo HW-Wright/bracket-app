@@ -97,15 +97,24 @@ export function PageTitle({
     <header className={`relative mr-2 mb-8 w-fit max-w-[calc(100%-0.5rem)] ${eyebrow ? 'mt-3' : ''}`}>
       <div aria-hidden className="plate absolute inset-0 translate-x-[7px] translate-y-[7px] bg-orange" />
       {eyebrow && (
-        <Badge className="absolute -top-3 left-2.5 z-[2]">
+        <Badge className="absolute -top-3 left-2.5 z-[2] whitespace-nowrap">
           {eyebrow}
         </Badge>
       )}
       <div className={`plate relative bg-plate pr-10 pl-3.5 text-white ${eyebrow ? 'pt-4' : 'pt-2.5'} ${sub ? 'pb-4' : 'pb-2.5'}`}>
+        {/* Invisible copies of the tabs keep the plate at least as wide as them, so a long tab never wraps over the title. */}
+        {[eyebrow, sub].map(
+          (t, i) =>
+            t && (
+              <span key={i} aria-hidden className={`invisible block h-0 overflow-hidden px-2.5 text-[13px] font-extrabold tracking-[0.12em] whitespace-nowrap uppercase italic ${i ? 'ml-2.5' : '-ml-1'}`}>
+                {t}
+              </span>
+            ),
+        )}
         <h1 className="font-display text-[30px] leading-[1.05] font-extrabold uppercase italic">{children}</h1>
       </div>
       {sub && (
-        <Badge tone="yellow" className="absolute -bottom-3.5 left-6 z-[2]">
+        <Badge tone="yellow" className="absolute -bottom-3.5 left-6 z-[2] whitespace-nowrap">
           {sub}
         </Badge>
       )}
