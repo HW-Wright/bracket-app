@@ -1,6 +1,6 @@
 # The Gang Does a Bracket
 
-Private, mobile-first bracket voting for eight friends: everyone nominates 15 ranked entries, the app seeds a 64-entry bracket, and the group votes round by round. Harry runs every phase.
+Private, mobile-first bracket voting for eight friends: everyone nominates 15 ranked entries, the app seeds a bracket of 8 to 128 entries (64 by default), and the group votes round by round. Harry runs every phase.
 
 - **Live:** https://hw-wright.github.io/bracket-app/
 - **Spec:** `SPEC.md` (source of truth) · **Conventions for future sessions:** `CLAUDE.md`

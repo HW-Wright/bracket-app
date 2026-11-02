@@ -6,14 +6,14 @@ A private, mobile-first web app where eight friends nominate entries on a changi
 
 ## 0. How to work (instructions for Claude Code)
 
-- **Read this whole file before doing anything.** Then produce a phased plan (see section 14), list every step that needs Harry to act manually, and start Phase 1.
-- **Automate everything you can.** Use the `gh` CLI and `supabase` CLI to create the repo, configure GitHub Pages, set secrets, link the project, push migrations and deploy functions. Only stop when a step truly needs Harry (creating an account, a browser login, pasting a secret, choosing something subjective).
+- **Read this whole file before changing behaviour**, plus `CLAUDE.md` (conventions and architecture) and `HANDOVER.md` (history, Harry's reasons, quirks, settings outside the repo, open items). The build in section 14 is complete; later changes are dated inline.
+- **Automate everything you can.** Use the `gh` CLI and `supabase` CLI to create the repo, configure GitHub Pages, set repo variables, link the project, push migrations and deploy functions. Only stop when a step truly needs Harry (creating an account, a browser login, pasting a secret, choosing something subjective).
 - **When Harry must act, give exact, copy-pasteable terminal commands** in a single block, say where to run them, and say what output to expect. Harry is comfortable with the terminal and Git; do not over-explain basics.
 - **Check prerequisites first:** Node LTS, `gh`, `supabase` CLI, Docker. Install what you can; tell Harry exactly how to install the rest.
-- **Commit after each phase** with a clear message, and make sure tests pass before moving on.
-- **Never commit secrets.** The repo will be public (GitHub Pages is only free for public repos). The Supabase anon key is safe to expose by design, but only because Row Level Security is enforced on every table. The service role key must only ever live in a gitignored local `.env` and in Supabase function secrets.
+- **Commit after each change** with a clear message, and make sure tests pass before moving on.
+- **Never commit secrets.** The repo is public (GitHub Pages is only free for public repos). The Supabase publishable key is safe to expose by design, but only because Row Level Security is enforced on every table. The secret key must only ever live in a gitignored local `.env`; Edge Functions get the service role key from Supabase automatically.
 - **Ask before any destructive action against the live database.**
-- **Create a `CLAUDE.md`** early with project conventions, commands and architecture notes so future sessions have context.
+- **Keep `CLAUDE.md` up to date** with project conventions, commands and architecture notes so future sessions have context.
 - **Keep it lean.** Eight users, free tiers. No over-engineering, no paid services.
 
 ---
@@ -21,8 +21,8 @@ A private, mobile-first web app where eight friends nominate entries on a changi
 ## 1. Stack
 
 - **Front end:** Vite + React + TypeScript. Tailwind CSS with custom design tokens. Static build only.
-- **Routing:** must work on GitHub Pages. Use hash routing, or a `404.html` SPA fallback. Your call, but deep links must survive a refresh.
-- **Backend:** Supabase free tier: Postgres, Auth, Storage, Realtime, Postgres functions (RPC), and Edge Functions only where the service role key is required.
+- **Routing:** must work on GitHub Pages, and deep links must survive a refresh. Hash routing (`HashRouter`) was chosen over a `404.html` SPA fallback.
+- **Backend:** Supabase free tier: Postgres, Auth, Storage, Realtime, Postgres functions (RPC), and Edge Functions only where the secret key is required.
 - **Database changes:** all schema, RLS policies, functions and triggers as migrations in `supabase/migrations`, applied with the CLI. No manual dashboard edits except where unavoidable (document them in the README if so).
 - **Hosting:** GitHub Pages, deployed by a GitHub Actions workflow on every push to `main`.
 - **Keep-alive:** Supabase pauses free projects after about 7 days of low activity, and there may be weeks between brackets. Add a scheduled GitHub Actions workflow that makes a lightweight real database call (a tiny RPC) every 3 days. Document how to resume a paused project anyway.
@@ -39,8 +39,8 @@ A private, mobile-first web app where eight friends nominate entries on a changi
 - **Login is username + password.** Username is case-insensitive (e.g. `joe`, `Joe`). Supabase Auth needs an email, so map each username to a synthetic internal email on a placeholder domain. Users never see it, and no emails are ever sent. Disable email confirmation. Verify the placeholder domain is accepted by Supabase Auth when creating users via the admin API.
 - **Initial passwords:** Harry wants them simple. Supabase enforces a minimum password length of 6, so bare first names will fail for most users. Read initial passwords from a gitignored local file `users.local.json` (create a `users.example.json` template), and on first login **force a password change** (flag on the profile; block the rest of the app until changed).
 - **Sessions:** keep users logged in on their phones for as long as Supabase allows (persisted session, auto refresh). Logging in repeatedly is the fastest way to lose friends from the app.
-- **Seed script:** `npm run seed:users` creates the eight auth users and profiles from `users.local.json` using the service role key from `.env`. Idempotent.
-- **Admin user management (in-app):** an Edge Function, callable only by an admin, to reset a user's password to a temporary one (sets the force-change flag), add a user, and deactivate a user.
+- **Seed script:** `npm run seed:users` creates the eight auth users and profiles from `users.local.json` using the secret key (`SUPABASE_SECRET_KEY`) from `.env`. Idempotent.
+- **Admin user management (in-app):** an Edge Function, callable only by an admin, to reset a user's password to a temporary one (sets the force-change flag), add a user, and deactivate or reactivate a user.
 
 ---
 
@@ -54,7 +54,7 @@ Phases, all advanced manually by Harry. No deadlines or timers anywhere (users a
 2. **Nominations open:** users submit ranked nominations.
 3. **Review:** nominations closed and revealed; Harry audits, merges, adds images, previews seeding.
 4. **Live:** seeding locked, voting runs stage by stage.
-5. **Complete:** champion and podium shown. Harry can **archive it straight away** (Admin → Archive now, Harry 2026-11-02), leaving no active bracket until he starts the next one; starting the next one also archives it.
+5. **Complete:** champion and podium shown. Harry can **archive it straight away** (Admin → Archive now, Harry 2026-11-02), leaving no active bracket until the next one is created; creating the next one also archives it.
 
 The home screen is phase-aware and always shows the single most relevant action (e.g. "Submit your nominations", "Vote in the Round of 64", "See the champion").
 
@@ -100,7 +100,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 ### 5.5 Scoring and seeding
 - **Points:** each nomination is worth `16 - rank` (rank 1 = 15 points, rank 15 = 1 point). An entry's score is the sum across nominators.
 - **Order:** points descending, then number of distinct nominators descending, then a **random tiebreak value**.
-- The random tiebreak value is generated **once** per entry when it is created and stored, so the preview is stable and cannot be rerolled. When entries are merged, the merged entry keeps one of the existing values (document which).
+- The random tiebreak value is generated **once** per entry when it is created and stored, so the preview is stable and cannot be rerolled. When entries are merged, the merged entry keeps the value of the earlier-created entry (the merge target).
 - **Seeding preview:** show seeds 1 to the bracket size with points and nominator count, and a clear **cut line**. Everything below it is listed as "Cut" with its points. Harry sees exactly what will be cut before locking.
 - If there are fewer entries than the bracket size, show the shortfall and disable locking until Harry adds enough.
 - **Lock seeding** (with confirmation) generates the bracket and opens the first voting stage.
@@ -160,7 +160,7 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 
 ## 9. History and seed paths
 
-- **Bracket history:** every closed stage, viewable at any time. Mobile-friendly: round-by-round lists with an optional horizontally scrollable bracket tree for completed rounds.
+- **Bracket history:** every closed stage, viewable at any time. Mobile-friendly: a horizontally scrollable bracket tree (the default view, Harry 2026-10-23) and round-by-round lists.
 - Each closed matchup shows final tallies, who voted for which entry, and any coin-toss or admin badge.
 - **Who voted for who** (Harry, 2026-10-27): voters must be easy to find, not only via an entry's path. Home shows a "Who voted for who" panel (below Mystery seeds) for the most recently closed round, **by player** (each person's hit rate, tap to see their picks with ✓/✗; your own row starts open) or **by match** (every game with name chips under each side, yours in orange). The Bracket page has a third view, **Who voted**, with tabs for every closed round (`/bracket?view=votes`). Open-stage votes stay hidden (RLS).
 - **Entry page:** tap any entry anywhere to see its seed, points, who nominated it and at what rank, and its full path through the bracket (each opponent, tally, voters, result). People enjoy following a seed's run, so make this page good.
@@ -177,7 +177,7 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 - **Lone wolf:** times someone was the only vote an entry got.
 - **Consensus vs chaos:** seeded entries with 2+ nominators vs one-person picks vs manual fill-ins: count, still alive, average round reached, best run.
 - **Bracket summary:** total votes, games decided, unanimous results (2+ votes, all for the winner), coin tosses, upsets, admin decisions. Also shown on each archived bracket.
-- **Kingmaker** (times a vote decided a one-vote win) was dropped (Harry, 2026-11-02): in practice it only counted who voted last.
+- **Kingmaker** (times a vote decided a one-vote win) was dropped (Harry, 2026-10-30; removed 2026-11-02): in practice it only counted who voted last.
 - Voter-based stats use closed stages only (open-stage votes stay hidden). Each stat is its own titled panel, with a jump menu at the top showing every stat in wrapping rows. Added by Harry, 2026-10-23.
 - Lives on its own bottom-nav tab. Profile moves to an avatar button in the header to make room.
 
@@ -185,7 +185,7 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 - During a live bracket, Home shows how many of your 15 nominations are still in the bracket (e.g. "13/15"), listing each one's state: leading, trailing or tied in the open stage, waiting for a later stage, knocked out, or missed the cut at seeding.
 
 ### 9.3 Mystery seeds (added by Harry, 2026-10-24)
-- When seeding is locked, every active player is dealt one random, distinct entry **from the top half of the seeds** (1–32 in a 64 bracket; Harry, 2026-10-27, from the next bracket on). The pool only widens, up to the whole bracket, when there are more players than top-half seeds (e.g. eight players in an 8 bracket). Only that player can see theirs (the admin included: nobody sees anyone else's hidden one).
+- When seeding is locked, every active player is dealt one random, distinct entry **from the top half of the seeds** (1–32 in a 64 bracket; Harry, 2026-10-30, for brackets locked from 2026-11-02). The pool only widens, up to the whole bracket, when there are more players than top-half seeds (e.g. eight players in an 8 bracket). Only that player can see theirs (the admin included: nobody sees anyone else's hidden one).
 - Home lists all players in seed order of their entries (best seed first), numbered 1 to n, **without showing seed numbers**: player name on one side, a mystery icon on the other.
 - An entry is revealed to everyone when it goes out (loses a matchup other than the third-place playoff) or wins the final; the row then shows the entry and how far it got. Undoing a stage hides a reveal it caused.
 - Enforced on the server: clients read only `mystery_board()`, which returns entry details just for the caller's own row and revealed rows. Brackets locked before this feature can be dealt from Admin → Stage control.
@@ -200,7 +200,7 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 ## 11. Archive
 
 - A bracket is archived by stamping `brackets.archived_at`; nothing is moved or deleted. It keeps its nominations, entries and merges, seeds, matchups, tallies, votes, mystery-seed deal and images (storage `entry-images/<bracket id>/`).
-- Archiving happens when Harry presses **Archive now** on a finished bracket (Admin), or automatically when he starts the next bracket. Only a complete bracket can be archived; a finished one can instead be deleted.
+- Archiving happens when Harry presses **Archive now** on a finished bracket (Admin), or automatically when the next bracket is created. Only a complete bracket can be archived; a finished one can instead be deleted.
 - A list of past brackets: title, dates, champion, podium.
 - Each opens a read-only view of the full history, nominations and entry pages.
 - Harry can start a new bracket only when no bracket is active or the active one is complete.
@@ -213,10 +213,10 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 - **Home** (phase-aware call to action, current bracket title).
 - **Nominate** (own list while open; everyone's lists after close).
 - **Vote** (current stage).
-- **Bracket** (history and tree).
-- **Stats** (rolling vote totals, upsets).
+- **Bracket** (tree, round-by-round results and who voted; champion card when complete).
+- **Stats** (section 9.1).
 - **Entry** (detail and path).
-- **Archive**.
+- **Archive** ("Past brackets", linked from the Bracket page and Profile).
 - **Profile** (change password, log out), reached from the header avatar.
 - **Admin** (visible to Harry only): bracket setup, nominations control, review and merge, images, seeding preview and lock, stage control, user management.
 - Mobile bottom navigation; admin reached via an extra tab or menu item for Harry only.
@@ -225,21 +225,21 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 
 ## 13. Design
 
-**Direction D colours with direction F layouts** (Harry: D chosen 2026-10-23, F's "Saturday Results Show" layouts and type adopted 2026-10-24, keeping D's colour scheme). Reference mockups: the Bracket Theme Directions canvas, rows D and F.
+**Direction D colours with direction F layouts** (Harry: D chosen 2026-10-23, F's "Saturday Results Show" layouts and type adopted 2026-10-24, keeping D's colour scheme). Reference mockups: the Bracket Theme Directions canvas, rows D, F and G (G4 titles, G6 crawls); the link is in `HANDOVER.md`.
 
 ### Mood
 - A retro arcade take on a 90s TV sports broadcast of a college basketball tournament: on-screen broadcast graphics (slanted banners and caption bars, LIVE badge) combined with arena LED scoreboard numbers.
 - Evoke the genre only. Do not use NCAA trademarks ("March Madness", "Final Four", "Elite Eight", "Sweet Sixteen") or any network or league branding.
 
 ### Palette (define all as tokens; meet WCAG AA)
-- Grounds: navy `#0a1640` (page), `#13235e` (panels), `#0e1b4d` (panel headers), `#1d3180` (active tab), lines `#2a3f8f`.
-- Broadcast accent: court orange `#ff7a1a` (primary: header rule, selected pick, section labels); yellow `#ffd21f` (secondary: VS badge, offset shadows, sub-captions).
-- LED: amber `#ffb21e` digits on dark dot-matrix insets (`#05091c` + fine dot texture).
-- Status: red `#e8343a` (LIVE, TIED, upsets, errors), muted text `#aab6e0`, text white.
+- Grounds: navy `#0a1640` (page), `#13235e` (panels, inputs), `#1d3180` (panel header strips, active tab), `#0e1b4d` (app header, number insets, inner strips), lines `#2a3f8f`; title plates near-black `#1b1b1b`.
+- Broadcast accent: court orange `#ff7a1a` (primary: header rule, selected pick, tabs, top crawl); yellow `#ffd21f` (secondary: offset boxes, captions, level scores, results crawl).
+- LED digits: amber `#ffb21e` on dark insets (the dot-matrix texture went with direction F).
+- Status: LIVE badge and admin-decision red `#d62b31` (white text); LIVE dot `#ff1a1a`; red text on navy `#ff6b6b` (errors, cut line, SHOCK upsets, repeats); green `#7ee08a` (complete, ✓); muted text `#aab6e0`; text white.
 
 ### Typography (direction F format, adopted 2026-10-24)
 - Headlines, buttons and tabs: **Roboto Condensed** 800 italic caps. Body and controls: Roboto Condensed 500–700.
-- Teleprinter text (both crawls, classified results): **IBM Plex Mono** 600 caps in amber.
+- Teleprinter text (both crawls, classified results): **IBM Plex Mono** 600 caps; white on the orange top crawl, navy on the yellow results crawl, amber with white winners in the classified results.
 - Numbers: bold condensed; amber on dark insets, or navy in white score boxes.
 
 ### Motifs (direction F layouts in direction D colours)
@@ -259,6 +259,8 @@ So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 h
 - Respect `prefers-reduced-motion`.
 
 ## 14. Build phases and acceptance criteria
+
+All eight phases were completed and deployed on 2026-10-23.
 
 1. **Scaffold and deploy:** repo created (public) via `gh`, Vite app builds, GitHub Actions deploys to Pages, Supabase project linked, env and secrets wired, keep-alive workflow running. *Done when the placeholder app loads at the Pages URL and can read from Supabase.*
 2. **Auth and users:** seed script, username login, forced password change, persistent sessions, admin user management function, profiles with admin flag. *Done when all eight can log in and only Harry sees Admin.*
