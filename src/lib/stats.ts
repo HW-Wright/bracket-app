@@ -146,7 +146,7 @@ export interface CinderellaRound {
 /** For each round that has been drawn, the lowest seed (highest number) playing in it. */
 export function cinderella(matchups: Matchup[]): CinderellaRound[] {
   const out: CinderellaRound[] = []
-  for (let round = 1; round <= 6; round++) {
+  for (let round = 0; round <= 6; round++) {
     const entries = matchups
       .filter((m) => m.round === round && !isThirdPlace(m))
       .flatMap((m) => [m.a, m.b])
@@ -283,21 +283,10 @@ export function loneWolf(users: string[], matchups: Matchup[], votes: Vote[]): P
   return [...rows.values()].filter((r) => r.count > 0).sort((x, y) => y.count - x.count)
 }
 
-/** Times someone's vote decided a matchup won by one vote (every winning voter was decisive). */
-export function kingmaker(users: string[], matchups: Matchup[], tallies: Record<string, Tally>, votes: Vote[]): PersonCount[] {
-  const bal = ballots(matchups, votes)
-  const rows = new Map(users.map((u) => [u, { user: u, count: 0 }]))
-  for (const m of decided(matchups)) {
-    const [wv, lv] = winnerVotes(m, tallies)
-    if (m.decided_by !== 'votes' || wv - lv !== 1) continue
-    for (const [u, e] of bal.get(m.id) ?? []) if (e === m.winner && rows.has(u)) rows.get(u)!.count++
-  }
-  return [...rows.values()].filter((r) => r.count > 0).sort((x, y) => y.count - x.count)
-}
-
 export interface ConsensusGroup {
   key: 'consensus' | 'solo' | 'manual'
   entries: number
+  /** Average number of rounds reached (1 = went out in the first round), whatever the bracket size. */
   avgRound: number
   alive: number
   best: { entry: EntryRef; round: number } | null
@@ -310,8 +299,9 @@ function furthestRound(entryId: string, matchups: Matchup[]): number {
 
 /** Entries nominated by several people vs one-person picks vs manual fill-ins, and how far each group got. */
 export function consensusVsChaos(matchups: Matchup[], nominators: Record<string, number>): ConsensusGroup[] {
+  const first = Math.min(...matchups.map((m) => m.round))
   const seeded = new Map<string, EntryRef>()
-  for (const m of matchups) if (m.round === 1) for (const e of [m.a, m.b]) if (e) seeded.set(e.id, e)
+  for (const m of matchups) if (m.round === first) for (const e of [m.a, m.b]) if (e) seeded.set(e.id, e)
   const lost = new Set(matchups.filter((m) => !isThirdPlace(m)).map(loserOf).filter(Boolean).map((e) => e!.id))
   const groups: ConsensusGroup[] = (['consensus', 'solo', 'manual'] as const).map((key) => ({ key, entries: 0, avgRound: 0, alive: 0, best: null }))
   const sums = [0, 0, 0]
@@ -321,7 +311,7 @@ export function consensusVsChaos(matchups: Matchup[], nominators: Record<string,
     const g = groups[i]
     const round = furthestRound(e.id, matchups)
     g.entries++
-    sums[i] += round
+    sums[i] += round - first + 1
     if (!lost.has(e.id)) g.alive++
     if (!g.best || round > g.best.round || (round === g.best.round && (e.seed ?? 99) > (g.best.entry.seed ?? 99))) g.best = { entry: e, round }
   }

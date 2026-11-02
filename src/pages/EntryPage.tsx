@@ -5,7 +5,7 @@ import { useBracketData } from '../bracket/useBracketData'
 import EntryThumb from '../components/EntryThumb'
 import MatchupCard from '../components/MatchupCard'
 import { Badge, Card, Led } from '../components/ui'
-import { ROUNDS } from '../lib/bracket'
+import { roundName } from '../lib/bracket'
 import { entryPath, isThirdPlace, pickStatus, podium } from '../lib/stats'
 import { supabase } from '../lib/supabase'
 import { VoterReveal } from './bracket/BracketView'
@@ -91,10 +91,10 @@ export default function EntryPage() {
     ? ''
     : place ?? {
         cut: 'Missed the cut',
-        out: status.kind === 'out' ? `Out in the ${ROUNDS[status.round - 1].name}` : '',
+        out: status.kind === 'out' ? `Out in the ${roundName(status.round)}` : '',
         champion: 'Champion',
         playing: status.kind === 'playing' ? `${status.state} ${status.score[0]}–${status.score[1]}` : '',
-        waiting: status.kind === 'waiting' ? `Through to the ${ROUNDS[Math.min(status.round, 6) - 1].name}` : '',
+        waiting: status.kind === 'waiting' ? `Through to the ${roundName(status.round)}` : '',
       }[status.kind]
 
   return (
@@ -153,7 +153,7 @@ export default function EntryPage() {
               const closed = data.stages.find((s) => s.number === m.stage)?.status === 'closed'
               return (
                 <div key={m.id} className="flex flex-col gap-1">
-                  <span className="label-caps">{isThirdPlace(m) ? 'Third-place playoff' : ROUNDS[m.round - 1].name}</span>
+                  <span className="label-caps">{isThirdPlace(m) ? 'Third-place playoff' : roundName(m.round)}</span>
                   <MatchupCard
                     number={m.slot + 1}
                     matchup={m}

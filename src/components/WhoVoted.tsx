@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthProvider'
 import type { BracketData } from '../bracket/useBracketData'
 import { useBracketData } from '../bracket/useBracketData'
 import type { EntryRef, Matchup } from '../bracket/useStage'
-import { ROUNDS } from '../lib/bracket'
+import { roundName } from '../lib/bracket'
 import { isThirdPlace, playerPicks } from '../lib/stats'
 import { Card, Led } from './ui'
 
@@ -15,7 +15,7 @@ export function closedRounds(data: BracketData): number[] {
   return [...new Set(data.stages.filter((s) => s.status === 'closed').map((s) => s.round))].sort((a, b) => a - b)
 }
 
-const shortRound = (round: number) => (round === 6 ? 'Final' : ROUNDS[round - 1].name.replace('Round of ', 'R'))
+const shortRound = (round: number) => roundName(round).replace('Round of ', 'R')
 const gameTitle = (m: Matchup, i: number) => (isThirdPlace(m) ? 'Third place' : m.round === 6 ? 'The final' : `Match ${i + 1}`)
 
 function NameChip({ name, mine }: { name: string; mine: boolean }) {

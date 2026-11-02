@@ -73,7 +73,7 @@ To point the dev server at the local stack instead of live, create `.env.local` 
 | `npm run test:queries` | The app's history/stats queries as a normal user | local stack |
 | `npm run dry-run` | End-to-end: 8 fake users nominate, close, merge, lock, random votes through every stage, champion; then wipes | local stack |
 
-`npm run dry-run -- --stages=1` stops with the Round of 32 open and keeps the data so you can click around locally (log in as `zdry-harry` / `dry-run-pass`); `npm run dry-run -- --wipe` removes it.
+`npm run dry-run -- --size=8` plays an 8-seed bracket (any of 8/16/32/64/128). `npm run dry-run -- --stages=1` stops with the second round open and keeps the data so you can click around locally (log in as `zdry-harry` / `dry-run-pass`); `npm run dry-run -- --wipe` removes it.
 
 Also: `npm run typecheck`, `npm run lint`, `npm run build`.
 
@@ -84,7 +84,7 @@ Also: `npm run typecheck`, `npm run lint`, `npm run build`.
 Everything is in the **Admin** tab (★). Only you see it.
 
 ### Start a bracket
-1. Admin → **Start a new bracket**: title (the topic) and optional description. It's created as a **draft**; nobody can nominate yet.
+1. Admin → **Start a new bracket**: title (the topic), optional description and **size** (8, 16, 32, 64 or 128 seeds; 64 by default). It's created as a **draft**; nobody can nominate yet. You can change the size (Edit) until you lock seeding.
 2. **Open nominations.** Everyone ranks exactly 15, #1 = 15 points to #15 = 1. Lists stay private (to you too) until you close.
 3. Watch Admin's status list (who's at 15/15, who's on a draft, who has a repeat). Nudge people.
 
@@ -96,13 +96,13 @@ Everything is in the **Admin** tab (★). Only you see it.
 5. **Review & seeding ▸**
    - **Suggestions**: likely duplicates (e.g. typos). **Merge…** (pick the name) or **Not the same**. Exact matches (case, punctuation, spaces, hyphens, leading "The") were already combined.
    - **Entries**: tick two to merge; tap one to **unmerge**, **split spellings**, **rename**, **remove** (restorable), or **add an image** (resized on your phone automatically).
-   - Fewer than 64? Add entries manually (they score 0).
-   - **Seeding**: seeds 1–64 by points → nominators → fixed random tiebreak, with the **cut line**.
-6. **Lock seeding and tip off.** Seeds and entries freeze (images can still be added) and the Round of 64 opens for voting.
+   - Fewer entries than the size? Add entries manually (they score 0).
+   - **Seeding**: seeds 1 to the size by points → nominators → fixed random tiebreak, with the **cut line**.
+6. **Lock seeding and tip off.** Seeds and entries freeze (images can still be added) and the first round opens for voting. Everyone is dealt a mystery seed from the top half of the seeds.
 
 ### Run the rounds
 7. People vote on the **Vote** tab; tallies update live, voters stay hidden.
-8. Admin → **Stage control → Close stage and advance.** Check the summary (ties go to a server-side coin toss), confirm. Voters are revealed and the next round opens. Six stages: R64, R32, R16, QF, SF, Final + third place.
+8. Admin → **Stage control → Close stage and advance.** Check the summary (ties go to a server-side coin toss), confirm. Voters are revealed and the next round opens. One stage per round, ending with Final + third place (a 64 bracket has six: R64, R32, R16, QF, SF, Final; 128 has seven, 8 has three).
 9. **Undo last advance** (type `UNDO`): reopens the stage you just closed and discards any votes already cast in the next one. Coin tosses are kept.
 10. **Override a result** (type `OVERRIDE`), for bugs only: shown publicly as an Admin decision. Only possible until the next matchup is decided.
 
@@ -111,9 +111,10 @@ Everything is in the **Admin** tab (★). Only you see it.
 - **A round:** Undo last advance (above). **Finished bracket:** Undo last advance reopens the final.
 - **Review → Nominations:** Reopen nominations (discards review work).
 
-### Finish and start the next one
+### Finish, archive and start the next one
 11. After the final stage the champion screen appears on the **Bracket** tab and Home.
-12. Starting the next bracket automatically moves the finished one to the **Archive**.
+12. Admin → **Archive now** moves it to **Past brackets** straight away (Home then shows no bracket until you start one). Or skip that: starting the next bracket archives the finished one automatically.
+13. Archiving moves nothing and deletes nothing: the bracket stays in the Supabase database with every nomination, vote, result, mystery seed and image, and is viewable read-only by everyone under Bracket → Past brackets.
 
 ### Abandon a bracket
 Admin → **Abandon bracket…**, type its title (case and punctuation don't matter). Works in any phase and deletes everything, including votes and images. A finished bracket can also be **deleted instead of archived**.

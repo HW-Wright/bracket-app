@@ -42,7 +42,7 @@ export default function Archive() {
       <PageTitle eyebrow="Hall of fame">Archive</PageTitle>
       {past === null ? null : past.length === 0 ? (
         <Card>
-          <p className="text-base text-muted">No past brackets yet. Finished brackets move here when Harry starts the next one.</p>
+          <p className="text-base text-muted">No past brackets yet. Finished brackets move here when Harry archives them or starts the next one.</p>
         </Card>
       ) : (
         <ol className="flex flex-col gap-3">

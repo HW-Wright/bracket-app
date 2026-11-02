@@ -4,6 +4,7 @@
 //   supabase start && npm run dry-run            # run and wipe
 //   npm run dry-run -- --keep                    # leave it in place to click around (wipe with --wipe)
 //   npm run dry-run -- --stages=2            # stop with stage 3 open, keep data
+//   npm run dry-run -- --size=8              # bracket size: 8, 16, 32, 64 (default) or 128
 //   npm run dry-run -- --wipe
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
@@ -83,7 +84,9 @@ async function main() {
   if (active) throw new Error(`An active bracket exists locally ("${active.title}"); abandon it first.`)
 
   // 2. Bracket + nominations. One user (Hutton) stops at 10 so their list doesn't count.
-  const bracketId = (await call(admin, 'create_bracket', { p_title: TITLE, p_description: 'Simulated by scripts/dry-run.ts' })) as string
+  const sizeArg = process.argv.find((a) => a.startsWith('--size='))
+  const size = sizeArg ? Number(sizeArg.split('=')[1]) : 64
+  const bracketId = (await call(admin, 'create_bracket', { p_title: TITLE, p_description: 'Simulated by scripts/dry-run.ts', p_size: size })) as string
   await call(admin, 'set_bracket_phase', { p_bracket_id: bracketId, p_to: 'nominations' })
   for (const [i, c] of clients.entries()) {
     const picks = shuffle(POOL).slice(0, i === 7 ? 10 : 15).map((t) => (VARIANTS[t] && Math.random() < 0.5 ? VARIANTS[t][rand(VARIANTS[t].length)] : t))
@@ -97,7 +100,7 @@ async function main() {
   const { data: peek } = await clients[3].from('nominations').select('user_id').eq('bracket_id', bracketId)
   assert.ok(peek!.every((n) => n.user_id === peek![0].user_id), 'blind while open')
 
-  // 3. Close: entries built, exact variants combined. Merge one fuzzy suggestion; top up to 64 if short.
+  // 3. Close: entries built, exact variants combined. Merge one fuzzy suggestion; top up to the bracket size if short.
   await call(admin, 'set_bracket_phase', { p_bracket_id: bracketId, p_to: 'review' })
   const suggestions = (await call(admin, 'duplicate_suggestions', { p_bracket_id: bracketId })) as { entry_a: string; entry_b: string; name_a: string; name_b: string }[]
   // Like Harry would: merge the genuine typo, leave e.g. "Spider-Man 2" vs "Spider-Man" alone.
@@ -110,7 +113,7 @@ async function main() {
   let standings = (await call(admin, 'entry_standings', { p_bracket_id: bracketId })) as { name: string; points: number; spellings: string[]; removed: boolean }[]
   const combined = standings.filter((s) => s.spellings.length > 1)
   console.log(`  entries: ${standings.length} (${combined.length} with several spellings, e.g. ${combined.slice(0, 2).map((s) => s.spellings.join(' / ')).join('; ') || 'none'})`)
-  for (let i = standings.filter((s) => !s.removed).length; i < 64; i++) await call(admin, 'add_manual_entry', { p_bracket_id: bracketId, p_name: `Manual ${i + 1}` })
+  for (let i = standings.filter((s) => !s.removed).length; i < size; i++) await call(admin, 'add_manual_entry', { p_bracket_id: bracketId, p_name: `Manual ${i + 1}` })
   standings = (await call(admin, 'entry_standings', { p_bracket_id: bracketId })) as typeof standings
   console.log(`  seed 1: ${standings[0].name} (${standings[0].points} pts)`)
 

@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(15);
 
 insert into auth.users (id, email, aud, role) values
   ('00000000-0000-0000-0000-0000000000a1', 'harry@test.invalid', 'authenticated', 'authenticated'),
@@ -28,6 +28,7 @@ select public.lock_seeding('00000000-0000-0000-0000-00000000bb01');
 select is((select count(*)::int from public.mystery_seeds), 3, 'locking deals one mystery seed per active player');
 select is((select count(distinct entry_id)::int from public.mystery_seeds), 3, 'all different entries');
 select is((select count(*)::int from public.mystery_seeds ms join public.entries e on e.id = ms.entry_id where e.seed is null), 0, 'only seeded entries are dealt');
+select ok((select max(e.seed) from public.mystery_seeds ms join public.entries e on e.id = ms.entry_id) <= 32, 'dealt from the top half of a 64 bracket (seeds 1-32)');
 select is(public.deal_mystery_seeds('00000000-0000-0000-0000-00000000bb01'), 0, 'dealing again does nothing (idempotent)');
 
 -- Pin the deal so the test is deterministic: Joe seed 1, Sean seed 2, Harry seed 64.

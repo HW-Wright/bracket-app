@@ -27,6 +27,7 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 
 ## Brackets & nominations
 - One active bracket (`archived_at is null`, enforced by a unique index). Phases: draft -> nominations -> review -> live -> complete.
+- `brackets.size` (8/16/32/64/128, default 64) is set in `create_bracket` / `update_bracket` and can change until seeding is locked. `archive_bracket()` archives a complete bracket now; `create_bracket` still auto-archives a complete one. Archiving only stamps `archived_at`: all data stays.
 - Phase moves via admin RPCs (`create_bracket`, `set_bracket_phase`, ...); `require_admin()` guards them.
 - Nominations are written only through `save_nominations(bracket, text[])` (replaces the caller's list). RLS: own rows always; the admin always (Harry's choice); everyone once phase is past `nominations`. Client code must filter by `user_id` when it wants "my" nominations.
 - `normaliseEntry()` / `entryKey()` in `src/lib/normalise.ts`: comparison forms (key = normalised with spaces removed). Phase 4 needs a SQL twin.
@@ -39,8 +40,9 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 - Closing nominations runs `build_entries()`: one `entries` row per `entry_key` from complete lists; each counted nomination's `entry_id` = the entry it ORIGINALLY landed in. Reopening deletes entries.
 - Merge = `entries.merged_into` (target = earlier-created entry, so it keeps its tiebreak). Scores are always computed by `entry_standings()` over the merge tree with the best-rank-per-user rule, so unmerge is just clearing `merged_into`. `split_entry()` undoes an auto-combine by spelling.
 - Order: points desc, nominators desc, stored `tiebreak` asc. `tiebreak` is set once at insert and never rewritten.
-- `lock_seeding()` sets seeds 1-64, creates `stages` (6, one per round) and all `matchups` (round 1-6; round 6 slot 1 = third place; round r slot s fed by r-1 slots 2s/2s+1), opens stage 1 (the whole R64), phase -> live.
-- `bracket_order()` / `stage_for()` in SQL mirror `src/lib/bracket.ts`; seeding.test.sql checks parity.
+- Rounds use one scale for every size: round r holds 2^(7-r) entries (0 = R128, 1 = R64 ... 4 = QF, 5 = SF, 6 = final; round 6 slot 1 = third place). The final is always round 6; smaller brackets start at `first_round(size)` / `firstRound(size)`. Never index `ROUNDS` by `round - 1`: use `roundName()` / `roundShort()`.
+- `lock_seeding()` sets seeds 1..size, creates one stage per round numbered from 1 (stage = round - first round + 1) and all `matchups` (round r slot s fed by r-1 slots 2s/2s+1), opens stage 1, deals mystery seeds, phase -> live.
+- `bracket_order()` / `first_round()` in SQL mirror `src/lib/bracket.ts`; seeding.test.sql and sizes.test.sql check parity.
 - Entry images: public bucket `entry-images`, admin-only writes (storage policies). Client resizes in `src/lib/image.ts`.
 - `npm run test:storage`: storage policy integration test (local).
 
@@ -55,14 +57,14 @@ Private mobile-first bracket voting app for 8 friends. Full requirements: `SPEC.
 
 ## History, stats, archive (Phase 6)
 - `useBracketData(bracketId)` loads one bracket (active or archived): stages, matchups, tallies, visible votes, names; tallies live.
-- Pure derivations in `src/lib/stats.ts` (upsets, voteTotals, entryPath, podium, pickStatus) with Vitest coverage.
+- Pure derivations in `src/lib/stats.ts` (upsets, voteTotals, entryPath, podium, pickStatus) with Vitest coverage. Kingmaker was dropped (Harry, 2026-11-02).
 - Who voted for who: `WhoVoted` (Home, latest closed round) / `WhoVotedRound` (Bracket `?view=votes`), by player via `playerPicks()` or by match.
 - Screens: `/bracket` (round tabs + tree, champion card when complete), `/entry/:id`, `/stats`, `/archive`, `/archive/:id`. `MatchupCard` is shared (vote mode via `onPick`, read-only via `link`).
 - `npm run test:queries`: PostgREST query smoke test (local).
-- `npm run dry-run [-- --stages=N | --keep | --wipe]`: full simulated bracket on the local stack (8 fake users).
+- `npm run dry-run [-- --size=N | --stages=N | --keep | --wipe]`: full simulated bracket on the local stack (8 fake users).
 
 ## Mystery seeds
-- `mystery_seeds` (no client access at all) is dealt by `assign_mystery_seeds()` at the end of `lock_seeding()`; `deal_mystery_seeds()` (admin) for brackets locked earlier.
+- `mystery_seeds` (no client access at all) is dealt from the top half of the seeds (widened only if there are more players than that) by `assign_mystery_seeds()` at the end of `lock_seeding()`; `deal_mystery_seeds()` (admin) for brackets locked earlier.
 - Clients read only `mystery_board(bracket)`: rows in seed order with entry fields null unless it's the caller's own row or revealed (lost a non-third-place matchup, or won the final). Never expose seed numbers for hidden rows.
 
 ## Conventions

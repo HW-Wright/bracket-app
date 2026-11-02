@@ -8,6 +8,8 @@ export interface Bracket {
   title: string
   description: string | null
   phase: BracketPhase
+  /** Seeds: 8, 16, 32, 64 or 128. */
+  size: number
   created_at: string
   nominations_opened_at: string | null
   nominations_closed_at: string | null
@@ -31,7 +33,7 @@ export function BracketProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     const { data } = await supabase
       .from('brackets')
-      .select('id, title, description, phase, created_at, nominations_opened_at, nominations_closed_at, locked_at, completed_at')
+      .select('id, title, description, phase, size, created_at, nominations_opened_at, nominations_closed_at, locked_at, completed_at')
       .is('archived_at', null)
       .maybeSingle()
     setBracket(data)

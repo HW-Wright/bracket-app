@@ -3,8 +3,7 @@ import { useBracket } from '../bracket/BracketProvider'
 import { useOpenStage } from '../bracket/useStage'
 import MatchupCard from '../components/MatchupCard'
 import { Card, ErrorText, Led, PageTitle } from '../components/ui'
-
-const ROUND_NAMES = ['', 'Round of 64', 'Round of 32', 'Round of 16', 'Quarter-finals', 'Semi-finals', 'The Final']
+import { roundName } from '../lib/bracket'
 
 export default function Vote() {
   const { bracket } = useBracket()
@@ -32,7 +31,7 @@ export default function Vote() {
     <>
       <div className="flex items-start justify-between gap-3">
         <PageTitle eyebrow={`Stage ${stage.number}${sectionLabel ? ` · ${sectionLabel}` : ''}`} sub={`${matchups.length} games`}>
-          {ROUND_NAMES[stage.round]}
+          {stage.round === 6 ? 'The Final' : roundName(stage.round)}
         </PageTitle>
         <div className="led mt-3 shrink-0 border border-line px-2.5 py-1 text-center" role="status">
           <span className="block font-led text-2xl leading-7 font-extrabold text-amber">

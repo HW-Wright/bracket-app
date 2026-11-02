@@ -4,7 +4,7 @@ import { useBracket } from '../bracket/BracketProvider'
 import { useBracketData, type BracketData } from '../bracket/useBracketData'
 import type { EntryRef } from '../bracket/useStage'
 import { Badge, Card, Led, PageTitle } from '../components/ui'
-import { ROUNDS } from '../lib/bracket'
+import { roundName } from '../lib/bracket'
 import {
   bracketSummary,
   cinderella,
@@ -12,7 +12,6 @@ import {
   entryPath,
   houdini,
   isThirdPlace,
-  kingmaker,
   loneWolf,
   MIN_SHARED,
   sheep,
@@ -35,7 +34,6 @@ function SeanZone() {
   )
 }
 
-const roundName = (r: number) => ROUNDS[Math.min(Math.max(r, 1), 6) - 1].name
 const short = (r: number) => (r >= 6 ? 'Final' : roundName(r).replace('Round of ', 'R'))
 const pct = (n: number, of: number) => (of ? `${Math.round((n / of) * 100)}%` : '—')
 
@@ -55,7 +53,6 @@ const SECTIONS = [
   ['twins', 'Taste twins'],
   ['sheep', 'Sheep'],
   ['wolf', 'Lone wolf'],
-  ['kingmaker', 'Kingmaker'],
   ['consensus', 'Consensus'],
   ['totals', 'Total votes'],
 ] as const
@@ -234,13 +231,12 @@ export default function Stats() {
   const totals = voteTotals(data.matchups, data.tallies).filter((t) => t.votes > 0 || t.wins > 0)
   const shown = showAll ? totals : totals.slice(0, 16)
   const cin = cinderella(data.matchups)
-  const lowest = data.matchups.flatMap((m) => [m.a, m.b]).find((e) => e?.seed === 64) ?? null
+  const lowest = data.matchups.flatMap((m) => [m.a, m.b]).find((e) => e?.seed === data.bracket.size) ?? null
   const lowestPath = lowest ? entryPath(lowest.id, data.matchups).filter((m) => !isThirdPlace(m)) : []
   const lowestOut = lowestPath.find((m) => m.winner && m.winner !== lowest?.id)
   const escapes = houdini(data.matchups, data.tallies)
   const sheepRows = sheep(users, data.matchups, data.tallies, data.votes)
   const wolves = loneWolf(users, data.matchups, data.votes)
-  const kings = kingmaker(users, data.matchups, data.tallies, data.votes)
   const groups = consensusVsChaos(data.matchups, nominators)
   const groupLabel = { consensus: 'Consensus (2+ nominators)', solo: 'One-person picks', manual: 'Manual fill-ins' }
   const noVotesYet = <Empty>Builds up as rounds close.</Empty>
@@ -269,7 +265,7 @@ export default function Stats() {
           </ol>
           {lowest && (
             <p className="mt-3 border-t-2 border-orange pt-3 text-base">
-              <span className="font-extrabold uppercase">How far #64 got:</span> <EntryLink e={lowest} />{' '}
+              <span className="font-extrabold uppercase">How far #{data.bracket.size} got:</span> <EntryLink e={lowest} />{' '}
               {lowestOut ? `went out in the ${roundName(lowestOut.round)}` : `is still alive (${roundName(Math.max(...lowestPath.map((m) => m.round)))})`}.
             </p>
           )}
@@ -339,10 +335,6 @@ export default function Stats() {
 
         <Section id="wolf" title="Lone wolf" blurb="Times someone was the only vote an entry got.">
           {wolves.length === 0 ? noVotesYet : <PeopleList rows={wolves} names={data.names} value={(r) => r.count} />}
-        </Section>
-
-        <Section id="kingmaker" title="Kingmaker" blurb="Times someone's vote decided a game won by one vote.">
-          {kings.length === 0 ? <Empty>No game has been won by a single vote yet.</Empty> : <PeopleList rows={kings} names={data.names} value={(r) => r.count} />}
         </Section>
 
         <Section id="consensus" title="Consensus vs chaos" blurb="Entries several people nominated vs one-person picks: how far each group got.">

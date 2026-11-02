@@ -4,15 +4,14 @@ import { useAuth } from '../../../auth/AuthProvider'
 import { useBracket } from '../../../bracket/BracketProvider'
 import EntryThumb from '../../../components/EntryThumb'
 import { Badge, Button, Card, ErrorText, Led, PageTitle } from '../../../components/ui'
+import { firstRound, roundName } from '../../../lib/bracket'
 import EntriesTab from './EntriesTab'
 import MergeDialog from './MergeDialog'
 import { rootOf, useReview, type ReviewData, type Standing, type Suggestion } from './useReview'
 
 type Act = (fn: string, args: Record<string, unknown>) => Promise<string | null>
-const SEEDS = 64
-
-function SeedRow({ s }: { s: Standing }) {
-  const cut = (s.position ?? 0) > SEEDS
+function SeedRow({ s, size }: { s: Standing; size: number }) {
+  const cut = (s.position ?? 0) > size
   return (
     <li className={`flex min-h-12 items-center gap-3 border-b border-line pr-3 last:border-0 ${cut ? 'opacity-60' : ''}`}>
       <Led className="flex h-12 w-11 shrink-0 items-center justify-center text-lg">{cut ? '—' : (s.seed ?? s.position)}</Led>
@@ -26,18 +25,18 @@ function SeedRow({ s }: { s: Standing }) {
   )
 }
 
-function SeedingTab({ data, locked, onLock, busy }: { data: ReviewData; locked: boolean; onLock: () => void; busy: boolean }) {
+function SeedingTab({ data, size, locked, onLock, busy }: { data: ReviewData; size: number; locked: boolean; onLock: () => void; busy: boolean }) {
   const live = data.standings.filter((s) => !s.removed)
-  const seeded = live.slice(0, SEEDS)
-  const cut = live.slice(SEEDS)
-  const shortfall = Math.max(0, SEEDS - live.length)
+  const seeded = live.slice(0, size)
+  const cut = live.slice(size)
+  const shortfall = Math.max(0, size - live.length)
 
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-3 gap-2 text-center">
         {[
           [live.length, 'Entries'],
-          [Math.min(SEEDS, live.length), 'Seeded'],
+          [Math.min(size, live.length), 'Seeded'],
           [cut.length, 'Cut'],
         ].map(([n, label]) => (
           <div key={label} className="flex flex-col border border-line bg-navy-800 py-2">
@@ -49,15 +48,15 @@ function SeedingTab({ data, locked, onLock, busy }: { data: ReviewData; locked: 
 
       {shortfall > 0 && !locked && (
         <p role="alert" className="border-2 border-danger bg-navy-900 p-3 text-base">
-          {shortfall} short of 64. Add entries manually on the Entries tab (they score 0) before you can lock.
+          {shortfall} short of {size}. Add entries manually on the Entries tab (they score 0) before you can lock.
         </p>
       )}
       <p className="text-base text-muted">Order: points, then number of nominators, then a fixed random tiebreak.</p>
 
-      <Card title={locked ? 'Locked seeds' : 'Seeds 1–64'}>
+      <Card title={locked ? 'Locked seeds' : `Seeds 1–${size}`}>
         <ol className="-m-4">
           {seeded.map((s) => (
-            <SeedRow key={s.entry_id} s={s} />
+            <SeedRow key={s.entry_id} s={s} size={size} />
           ))}
         </ol>
       </Card>
@@ -72,7 +71,7 @@ function SeedingTab({ data, locked, onLock, busy }: { data: ReviewData; locked: 
           <Card title={`Cut · ${cut.length}`}>
             <ol className="-m-4">
               {cut.map((s) => (
-                <SeedRow key={s.entry_id} s={s} />
+                <SeedRow key={s.entry_id} s={s} size={size} />
               ))}
             </ol>
           </Card>
@@ -244,8 +243,9 @@ export default function AdminReview() {
   async function lock() {
     if (!data) return
     const live = data.standings.filter((s) => !s.removed)
-    const cut = live.slice(SEEDS)
-    const msg = `Lock seeding for “${bracket!.title}”?\n\n${live.length} entries: seeds 1–64 are fixed${cut.length ? `, ${cut.length} cut` : ''}. Merges and edits are frozen (images can still be added). Voting opens for Round of 64 · Quarter A.`
+    const size = bracket!.size
+    const cut = live.slice(size)
+    const msg = `Lock seeding for “${bracket!.title}”?\n\n${live.length} entries: seeds 1–${size} are fixed${cut.length ? `, ${cut.length} cut` : ''}. Merges and edits are frozen (images can still be added). Voting opens for the ${roundName(firstRound(size))}.`
     if (!confirm(msg)) return
     setBusy(true)
     const err = await review.act('lock_seeding', { p_bracket_id: bracket!.id })
@@ -284,7 +284,7 @@ export default function AdminReview() {
       {!data ? (
         <p className="text-base text-muted">Loading…</p>
       ) : tab === 'Seeding' ? (
-        <SeedingTab data={data} locked={locked} onLock={lock} busy={busy} />
+        <SeedingTab data={data} size={bracket.size} locked={locked} onLock={lock} busy={busy} />
       ) : tab === 'Entries' ? (
         <EntriesTab bracketId={bracket.id} data={data} locked={locked} act={review.act} reload={review.reload} />
       ) : tab === 'Suggestions' ? (

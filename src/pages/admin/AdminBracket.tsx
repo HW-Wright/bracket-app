@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { rpcMessage, useBracket, type Bracket, type BracketPhase } from '../../bracket/BracketProvider'
 import { useProgress } from '../../bracket/useProgress'
 import { ActionLink, Badge, Button, Card, ErrorText, Led, TextField } from '../../components/ui'
+import { BRACKET_SIZES, DEFAULT_SIZE } from '../../lib/bracket'
 import { IMAGE_BUCKET } from '../../lib/image'
 import { supabase } from '../../lib/supabase'
 import { AllNominations, type NominationRow } from '../nominate/Nominate'
@@ -79,6 +80,7 @@ function OpenNominations({ bracketId }: { bracketId: string }) {
 function BracketForm({ bracket, onDone }: { bracket?: Bracket; onDone: () => void }) {
   const [title, setTitle] = useState(bracket?.title ?? '')
   const [description, setDescription] = useState(bracket?.description ?? '')
+  const [size, setSize] = useState<number>(bracket?.size ?? DEFAULT_SIZE)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -86,8 +88,8 @@ function BracketForm({ bracket, onDone }: { bracket?: Bracket; onDone: () => voi
     e.preventDefault()
     setBusy(true)
     const { error } = bracket
-      ? await supabase.rpc('update_bracket', { p_bracket_id: bracket.id, p_title: title, p_description: description })
-      : await supabase.rpc('create_bracket', { p_title: title, p_description: description })
+      ? await supabase.rpc('update_bracket', { p_bracket_id: bracket.id, p_title: title, p_description: description, p_size: size })
+      : await supabase.rpc('create_bracket', { p_title: title, p_description: description, p_size: size })
     setBusy(false)
     setError(rpcMessage(error))
     if (!error) onDone()
@@ -106,6 +108,27 @@ function BracketForm({ bracket, onDone }: { bracket?: Bracket; onDone: () => voi
           className="border border-line bg-navy-800 px-3 py-2 text-base text-white outline-none focus:border-orange"
         />
       </label>
+      <fieldset className="flex flex-col gap-1.5">
+        <legend className="label-caps mb-1.5">Bracket size (seeds)</legend>
+        <div className="grid grid-cols-5 gap-1">
+          {BRACKET_SIZES.map((n) => (
+            <button
+              key={n}
+              type="button"
+              aria-pressed={size === n}
+              onClick={() => setSize(n)}
+              className={`slant min-h-11 text-lg font-extrabold ${size === n ? 'bg-orange text-navy-950' : 'bg-navy-900 text-muted hover:text-white'}`}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
+        <span className="text-sm text-muted">
+          {size === 128
+            ? 'Can be changed until seeding is locked. Eight full lists give at most 120 different entries, so expect to add some by hand.'
+            : 'Can be changed until seeding is locked.'}
+        </span>
+      </fieldset>
       <ErrorText>{error}</ErrorText>
       <Button type="submit" disabled={busy}>
         {bracket ? 'Save changes' : 'Create bracket (draft)'}
@@ -160,20 +183,38 @@ export default function AdminBracket() {
 
   if (!bracket || bracket.phase === 'complete') {
     return (
-      <Card title="Start a new bracket">
+      <div className="flex flex-col gap-6">
         {bracket && (
-          <p className="mb-4 text-base text-muted">“{bracket.title}” will move to the archive.</p>
+          <Card title="Finished bracket" aside={<Badge>complete</Badge>}>
+            <p className="mb-1 font-display text-2xl leading-tight uppercase">{bracket.title}</p>
+            <p className="mb-4 text-base text-muted">
+              Archive it now to clear the decks, or leave it up: starting the next bracket archives it anyway. Archived
+              brackets keep everything and stay viewable under Past brackets.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Button
+                disabled={busy}
+                onClick={() =>
+                  run(
+                    () => supabase.rpc('archive_bracket', { p_bracket_id: bracket.id }),
+                    `Archive “${bracket.title}” now?\n\nIt moves to Past brackets with every vote and result kept. Home shows no bracket until you start the next one.`,
+                  )
+                }
+              >
+                Archive now
+              </Button>
+              <Button variant="danger" disabled={busy} onClick={abandon}>
+                Delete “{bracket.title}” instead of archiving…
+              </Button>
+              <ErrorText>{error}</ErrorText>
+            </div>
+          </Card>
         )}
-        <BracketForm onDone={refresh} />
-        {bracket && (
-          <>
-            <Button variant="danger" disabled={busy} onClick={abandon} className="mt-6 w-full">
-              Delete “{bracket.title}” instead of archiving…
-            </Button>
-            <ErrorText>{error}</ErrorText>
-          </>
-        )}
-      </Card>
+        <Card title="Start a new bracket">
+          {bracket && <p className="mb-4 text-base text-muted">Starting one also archives “{bracket.title}”.</p>}
+          <BracketForm onDone={refresh} />
+        </Card>
+      </div>
     )
   }
 
@@ -183,8 +224,11 @@ export default function AdminBracket() {
       aside={<Badge>{bracket.phase}</Badge>}
     >
       <div className="mb-4 flex items-start justify-between gap-3">
-        <p className="font-display text-2xl leading-tight uppercase">{bracket.title}</p>
-        {(bracket.phase === 'draft' || bracket.phase === 'nominations') && (
+        <div>
+          <p className="font-display text-2xl leading-tight uppercase">{bracket.title}</p>
+          <p className="label-caps mt-1">{bracket.size} seeds</p>
+        </div>
+        {(bracket.phase === 'draft' || bracket.phase === 'nominations' || bracket.phase === 'review') && (
           <Button variant="ghost" onClick={() => setEditing(!editing)}>
             {editing ? 'Cancel' : 'Edit'}
           </Button>

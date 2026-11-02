@@ -117,6 +117,9 @@ export default function Home() {
         <Card>
           <p className="text-base text-muted">When Harry opens the next bracket, your next move will appear here.</p>
         </Card>
+        <Link to="/archive" className="mt-4 flex min-h-11 items-center text-base font-bold text-orange uppercase">
+          Past brackets →
+        </Link>
         {profile?.is_admin && (
           <div className="mt-4">
             <Action to="/admin">Start a bracket</Action>

@@ -6,7 +6,7 @@ import EntryThumb from '../../components/EntryThumb'
 import MatchupCard from '../../components/MatchupCard'
 import { Badge, Card, LiveDot } from '../../components/ui'
 import { closedRounds, WhoVotedRound } from '../../components/WhoVoted'
-import { ROUNDS } from '../../lib/bracket'
+import { roundName, ROUNDS } from '../../lib/bracket'
 import { entryPath, isThirdPlace, podium, winnerOf } from '../../lib/stats'
 
 /** Who voted for which side, once the stage has closed. */
@@ -78,7 +78,7 @@ function ChampionCard({ data }: { data: BracketData }) {
             const [mine, theirs] = m.a?.id === p.first!.id ? [t?.votes_a ?? 0, t?.votes_b ?? 0] : [t?.votes_b ?? 0, t?.votes_a ?? 0]
             return (
               <li key={m.id} className="flex min-h-12 items-center gap-3 border-b border-line px-3 last:border-0">
-                <span className="w-24 shrink-0 text-sm font-bold text-muted uppercase">{ROUNDS[m.round - 1].name}</span>
+                <span className="w-24 shrink-0 text-sm font-bold text-muted uppercase">{roundName(m.round)}</span>
                 <span className="min-w-0 flex-1 truncate text-base font-semibold">
                   beat {opp?.name} <span className="text-muted">({opp?.seed})</span>
                 </span>
@@ -121,10 +121,10 @@ function Tree({ data }: { data: BracketData }) {
   const rounds = ROUNDS.map((r) => data.matchups.filter((m) => m.round === r.round && !isThirdPlace(m))).filter((ms) => ms.some((m) => m.a && m.b))
   return (
     <div className="-mx-4 overflow-x-auto px-4 pb-2">
-      <div className="flex gap-3" style={{ height: 32 * 54 }}>
+      <div className="flex gap-3" style={{ height: (rounds[0]?.length ?? 1) * 54 }}>
         {rounds.map((ms, i) => (
           <div key={i} className="flex shrink-0 flex-col">
-            <span className="label-caps mb-1 h-5">{ROUNDS[ms[0].round - 1].name}</span>
+            <span className="label-caps mb-1 h-5">{roundName(ms[0].round)}</span>
             <div className="flex flex-1 flex-col justify-around">
               {ms.map((m) => (
                 <TreeBox key={m.id} m={m} data={data} />
@@ -197,12 +197,12 @@ export default function BracketView({ data }: { data: BracketData }) {
                     onClick={() => setVoteRound(r)}
                     className={`slant min-h-11 shrink-0 px-3 text-base font-extrabold tracking-wider uppercase ${voteRound === r ? 'bg-orange text-navy-950' : 'bg-navy-800 text-muted'}`}
                   >
-                    {r === 6 ? 'Final' : ROUNDS[r - 1].name.replace('Round of ', 'R')}
+                    {roundName(r).replace('Round of ', 'R')}
                   </button>
                 ))}
               </div>
             )}
-            <Card title={`Who voted for who · ${ROUNDS[voteRound - 1].name}`}>
+            <Card title={`Who voted for who · ${roundName(voteRound)}`}>
               <WhoVotedRound key={voteRound} data={data} round={voteRound} initial="match" />
             </Card>
           </>
@@ -218,7 +218,7 @@ export default function BracketView({ data }: { data: BracketData }) {
                 onClick={() => setRound(r.round)}
                 className={`slant min-h-11 shrink-0 px-3 text-base font-extrabold tracking-wider uppercase ${round === r.round ? 'bg-orange text-navy-950' : 'bg-navy-800 text-muted'}`}
               >
-                {r.round === 6 ? 'Final' : r.name.replace('Round of ', 'R')}
+                {r.name.replace('Round of ', 'R')}
                 {r.round === openRound && <LiveDot className="ml-2 align-middle" />}
               </button>
             ))}

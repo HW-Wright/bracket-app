@@ -6,7 +6,6 @@ import {
   cinderellaWatch,
   consensusVsChaos,
   houdini,
-  kingmaker,
   loneWolf,
   sheep,
   tasteTwins,
@@ -76,7 +75,7 @@ describe('taste twins', () => {
   })
 })
 
-describe('sheep, lone wolf, kingmaker', () => {
+describe('sheep, lone wolf', () => {
   it('sheep: share of votes with the majority (ties skipped)', () => {
     expect(sheep(users, ms, tallies, votes).map((r) => [r.user, r.count, r.of])).toEqual([
       ['ann', 2, 2],
@@ -91,12 +90,6 @@ describe('sheep, lone wolf, kingmaker', () => {
       ['cat', 1],
     ])
   })
-  it('kingmaker: every winning voter in a one-vote win', () => {
-    expect(kingmaker(users, ms, tallies, votes).map((r) => [r.user, r.count])).toEqual([
-      ['ann', 1],
-      ['bob', 1],
-    ])
-  })
 })
 
 describe('consensus vs chaos', () => {
@@ -106,6 +99,13 @@ describe('consensus vs chaos', () => {
     expect(byKey.consensus).toMatchObject({ entries: 2, alive: 1 }) // e1 out, e32 alive
     expect(byKey.solo.best?.entry.seed).toBe(64) // reached R2
     expect(byKey.manual).toMatchObject({ entries: 2, alive: 1 })
+  })
+
+  it('counts rounds reached from the first round, so smaller brackets compare the same', () => {
+    // An 8 bracket starts at round 4 (QF): a QF loser reached 1 round, the SF finalist 2.
+    const games = [m('q1', 4, 0, 1, 8, 1), m('q2', 4, 1, 4, 5, 5), m('s1', 5, 0, 1, 5)]
+    const [solo] = consensusVsChaos(games, { e1: 1, e8: 1, e4: 1, e5: 1 })
+    expect(solo).toMatchObject({ entries: 4, alive: 2, avgRound: 1.5 })
   })
 })
 

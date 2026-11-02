@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { Link } from 'react-router'
-import { ROUNDS } from '../lib/bracket'
+import { roundName } from '../lib/bracket'
 import { supabase } from '../lib/supabase'
 import EntryThumb from './EntryThumb'
 import { Card } from './ui'
@@ -73,7 +73,7 @@ export default function MysterySeeds({ bracketId }: { bracketId: string }) {
             r.status === 'champion'
               ? ['CHAMPION', 'bg-yellow text-navy-950']
               : r.status === 'out'
-                ? [`OUT · ${r.out_round === 6 ? 'FINAL' : ROUNDS[(r.out_round ?? 1) - 1].name.replace('Round of ', 'R').toUpperCase()}`, 'bg-navy-900 text-muted']
+                ? [`OUT · ${r.out_round === 6 ? 'FINAL' : roundName(r.out_round ?? 1).replace('Round of ', 'R').toUpperCase()}`, 'bg-navy-900 text-muted']
                 : null
           return (
             <li key={r.user_id} className={`flex min-h-14 items-center gap-3 border-t border-line pr-3 ${r.is_mine ? 'bg-navy-700/60' : ''}`}>

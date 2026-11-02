@@ -1,6 +1,6 @@
 # The Gang Does a Bracket: Build Specification
 
-A private, mobile-first web app where eight friends nominate entries on a changing topic, the app seeds a 64-entry single-elimination bracket from ranked nominations, and the group votes round by round. Harry is the sole admin and controls every phase transition.
+A private, mobile-first web app where eight friends nominate entries on a changing topic, the app seeds a single-elimination bracket (8, 16, 32, 64 or 128 entries; 64 by default) from ranked nominations, and the group votes round by round. Harry is the sole admin and controls every phase transition.
 
 ---
 
@@ -50,11 +50,11 @@ Only **one active bracket** at a time. Past brackets are archived and viewable.
 
 Phases, all advanced manually by Harry. No deadlines or timers anywhere (users are across three continents).
 
-1. **Draft:** Harry creates a bracket with a title/topic and optional short description.
+1. **Draft:** Harry creates a bracket with a title/topic, optional short description and a **size: 8, 16, 32, 64 or 128 seeds** (Harry, 2026-11-02; default 64). The size can be changed until seeding is locked.
 2. **Nominations open:** users submit ranked nominations.
 3. **Review:** nominations closed and revealed; Harry audits, merges, adds images, previews seeding.
 4. **Live:** seeding locked, voting runs stage by stage.
-5. **Complete:** champion and podium shown; bracket moves to the archive when Harry starts the next one.
+5. **Complete:** champion and podium shown. Harry can **archive it straight away** (Admin → Archive now, Harry 2026-11-02), leaving no active bracket until he starts the next one; starting the next one also archives it.
 
 The home screen is phase-aware and always shows the single most relevant action (e.g. "Submit your nominations", "Vote in the Round of 64", "See the champion").
 
@@ -88,7 +88,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ### 5.3 Admin edits (for fixing problems, not shaping the result)
 - Edit canonical names.
-- Add entries manually (used when there are fewer than 64). Manual entries score 0 points.
+- Add entries manually (used when there are fewer entries than the bracket size). Manual entries score 0 points.
 - Remove entries, with confirmation. Removed entries go to a visible "Removed" list and can be restored until lock.
 
 ### 5.4 Images
@@ -101,25 +101,29 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - **Points:** each nomination is worth `16 - rank` (rank 1 = 15 points, rank 15 = 1 point). An entry's score is the sum across nominators.
 - **Order:** points descending, then number of distinct nominators descending, then a **random tiebreak value**.
 - The random tiebreak value is generated **once** per entry when it is created and stored, so the preview is stable and cannot be rerolled. When entries are merged, the merged entry keeps one of the existing values (document which).
-- **Seeding preview:** show seeds 1 to 64 with points and nominator count, and a clear **cut line**. Everything below 64 is listed as "Cut" with its points. Harry sees exactly what will be cut before locking.
-- If there are fewer than 64 entries, show the shortfall and disable locking until Harry adds enough.
+- **Seeding preview:** show seeds 1 to the bracket size with points and nominator count, and a clear **cut line**. Everything below it is listed as "Cut" with its points. Harry sees exactly what will be cut before locking.
+- If there are fewer entries than the bracket size, show the shortfall and disable locking until Harry adds enough.
 - **Lock seeding** (with confirmation) generates the bracket and opens the first voting stage.
 
 ---
 
 ## 6. Bracket structure
 
-- **Standard 64-seed bracket order**, generated algorithmically: round one pairs sum to 65 (1 v 64, 32 v 33, etc.), arranged so seeds 1 and 2 can only meet in the final, seeds 1 to 4 sit in different quarters, and so on. Unit test this.
-- **Stages** (each stage is what Harry opens and closes with one button):
+- **Sizes:** 8, 16, 32, 64 or 128 seeds, chosen per bracket (Harry, 2026-11-02). Brackets before this are 64.
+- **Standard bracket order**, generated algorithmically: round one pairs sum to size + 1 (for 64: 1 v 64, 32 v 33, etc.), arranged so seeds 1 and 2 can only meet in the final, seeds 1 to 4 sit in different quarters, and so on. Unit test this.
+- **Rounds** are numbered on one scale for every size, by how many entries are left (round r holds 2^(7−r)), so the final is always round 6 and a smaller bracket simply starts later. **Stages** (each is what Harry opens and closes with one button) are one per round, numbered from 1:
 
-| Stage | Round | Matchups |
-|---|---|---|
-| 1 | Round of 64 | 32 |
-| 2 | Round of 32 | 16 |
-| 3 | Round of 16 | 8 |
-| 4 | Quarter-finals | 4 |
-| 5 | Semi-finals | 2 |
-| 6 | Final + third-place playoff | 2 |
+| Round | Name | Matchups | Played by sizes |
+|---|---|---|---|
+| 0 | Round of 128 | 64 | 128 |
+| 1 | Round of 64 | 32 | 128, 64 |
+| 2 | Round of 32 | 16 | 128, 64, 32 |
+| 3 | Round of 16 | 8 | 128 to 16 |
+| 4 | Quarter-finals | 4 | all |
+| 5 | Semi-finals | 2 | all |
+| 6 | Final + third-place playoff | 2 | all |
+
+So a 64 bracket has six stages (Round of 64 to the final), 128 has seven and 8 has three.
 
 - **Each round is one stage, presented in its entirety** (decided by Harry, 2026-10-23, replacing the original release of the Round of 64 in quarters and the Round of 32 in halves).
 - **Third-place playoff:** the two semi-final losers play each other in the final stage alongside the final, to decide third place on the podium.
@@ -166,14 +170,14 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 ### 9.1 Stats page (added by Harry, 2026-10-23)
 - **Total votes (rolling):** every entry's cumulative votes across all stages so far, including live tallies in the open stage, with win–loss record and seed. Sorted by votes, then seed.
 - **Upsets:** every decided matchup where the lower seed (higher number) beat the higher seed, biggest seed gap first, showing seeds, score, round and any coin-toss or admin badge.
-- **Cinderella run:** the lowest seed playing in each round, and how far the #64 seed got. A "Cinderella watch" line (lowest seed still alive) also shows on Home while voting is live.
+- **Cinderella run:** the lowest seed playing in each round, and how far the last seed (#64 in a 64 bracket) got. A "Cinderella watch" line (lowest seed still alive) also shows on Home while voting is live.
 - **Houdini:** wins by a single vote plus coin tosses survived, per entry.
 - **Taste twins:** an 8x8 grid of how often each pair voted the same way in games both voted in; most aligned and most opposed pairs highlighted (pairs need 3+ shared games).
 - **Sheep:** how often each person voted with the majority (games with a clear majority).
 - **Lone wolf:** times someone was the only vote an entry got.
-- **Kingmaker:** times someone's vote decided a game won by one vote (every winning voter in such a game counts).
 - **Consensus vs chaos:** seeded entries with 2+ nominators vs one-person picks vs manual fill-ins: count, still alive, average round reached, best run.
 - **Bracket summary:** total votes, games decided, unanimous results (2+ votes, all for the winner), coin tosses, upsets, admin decisions. Also shown on each archived bracket.
+- **Kingmaker** (times a vote decided a one-vote win) was dropped (Harry, 2026-11-02): in practice it only counted who voted last.
 - Voter-based stats use closed stages only (open-stage votes stay hidden). Each stat is its own titled panel, with a jump menu at the top showing every stat in wrapping rows. Added by Harry, 2026-10-23.
 - Lives on its own bottom-nav tab. Profile moves to an avatar button in the header to make room.
 
@@ -181,7 +185,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - During a live bracket, Home shows how many of your 15 nominations are still in the bracket (e.g. "13/15"), listing each one's state: leading, trailing or tied in the open stage, waiting for a later stage, knocked out, or missed the cut at seeding.
 
 ### 9.3 Mystery seeds (added by Harry, 2026-10-24)
-- When seeding is locked, every active player is dealt one random, distinct seeded entry. Only that player can see theirs (the admin included: nobody sees anyone else's hidden one).
+- When seeding is locked, every active player is dealt one random, distinct entry **from the top half of the seeds** (1–32 in a 64 bracket; Harry, 2026-10-27, from the next bracket on). The pool only widens, up to the whole bracket, when there are more players than top-half seeds (e.g. eight players in an 8 bracket). Only that player can see theirs (the admin included: nobody sees anyone else's hidden one).
 - Home lists all players in seed order of their entries (best seed first), numbered 1 to n, **without showing seed numbers**: player name on one side, a mystery icon on the other.
 - An entry is revealed to everyone when it goes out (loses a matchup other than the third-place playoff) or wins the final; the row then shows the entry and how far it got. Undoing a stage hides a reveal it caused.
 - Enforced on the server: clients read only `mystery_board()`, which returns entry details just for the caller's own row and revealed rows. Brackets locked before this feature can be dealt from Admin → Stage control.
@@ -195,9 +199,11 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 
 ## 11. Archive
 
+- A bracket is archived by stamping `brackets.archived_at`; nothing is moved or deleted. It keeps its nominations, entries and merges, seeds, matchups, tallies, votes, mystery-seed deal and images (storage `entry-images/<bracket id>/`).
+- Archiving happens when Harry presses **Archive now** on a finished bracket (Admin), or automatically when he starts the next bracket. Only a complete bracket can be archived; a finished one can instead be deleted.
 - A list of past brackets: title, dates, champion, podium.
 - Each opens a read-only view of the full history, nominations and entry pages.
-- Harry can start a new bracket only when no bracket is active.
+- Harry can start a new bracket only when no bracket is active or the active one is complete.
 
 ---
 

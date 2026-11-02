@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from '../auth/AuthProvider'
 import { useBracketData } from '../bracket/useBracketData'
-import { ROUNDS } from '../lib/bracket'
+import { roundName } from '../lib/bracket'
 import { cinderellaWatch, isAlive, pickStatus, type PickStatus } from '../lib/stats'
 import { supabase } from '../lib/supabase'
 import { Badge, Card, Led } from './ui'
@@ -23,9 +23,9 @@ function label(s: PickStatus): [string, string] {
     case 'playing':
       return [`${s.state.toUpperCase()} ${s.score[0]}–${s.score[1]}`, s.state === 'leading' ? 'text-yellow' : s.state === 'tied' ? 'text-danger' : 'text-muted']
     case 'waiting':
-      return [s.round > 6 ? 'THROUGH' : `INTO ${ROUNDS[s.round - 1].name.toUpperCase()}`, 'text-muted']
+      return [s.round > 6 ? 'THROUGH' : `INTO ${roundName(s.round).toUpperCase()}`, 'text-muted']
     case 'out':
-      return [`OUT · ${ROUNDS[s.round - 1].name.replace('Round of ', 'R').toUpperCase()}`, 'text-muted']
+      return [`OUT · ${roundName(s.round).replace('Round of ', 'R').toUpperCase()}`, 'text-muted']
     case 'cut':
       return ['MISSED THE CUT', 'text-muted']
   }

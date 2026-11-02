@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bracketOrder, firstRoundPairs, STAGE_LABELS, stageFor, upsetMargin } from './bracket'
+import { BRACKET_SIZES, bracketOrder, firstRound, firstRoundPairs, roundName, roundsFor, stageOf, upsetMargin } from './bracket'
 
 const order = bracketOrder(64)
 const slotOfSeed = (seed: number) => Math.floor(order.indexOf(seed) / 2) // first-round slot 0..31
@@ -49,15 +49,30 @@ describe('bracketOrder', () => {
   })
 })
 
-describe('stageFor', () => {
-  it('releases each round in its entirety as one stage', () => {
-    const stage1 = firstRoundPairs().filter((_, slot) => stageFor(1, slot) === 1)
-    expect(stage1).toHaveLength(32)
-    expect([stageFor(2, 0), stageFor(2, 15), stageFor(3, 7), stageFor(4, 0), stageFor(5, 1), stageFor(6, 0), stageFor(6, 1)]).toEqual([2, 2, 3, 4, 5, 6, 6])
+describe('bracket sizes', () => {
+  it('always ends with the final as round 6, starting later for smaller brackets', () => {
+    expect(BRACKET_SIZES.map(firstRound)).toEqual([4, 3, 2, 1, 0])
+    expect(roundsFor(128).map((r) => r.name)).toEqual(['Round of 128', 'Round of 64', 'Round of 32', 'Round of 16', 'Quarter-finals', 'Semi-finals', 'Final'])
+    expect(roundsFor(8).map((r) => r.round)).toEqual([4, 5, 6])
   })
 
-  it('has six stages', () => {
-    expect(STAGE_LABELS).toHaveLength(6)
+  it('has one stage per round, numbered from 1', () => {
+    expect([stageOf(1, 64), stageOf(6, 64)]).toEqual([1, 6])
+    expect([stageOf(0, 128), stageOf(6, 128)]).toEqual([1, 7])
+    expect([stageOf(4, 8), stageOf(6, 8)]).toEqual([1, 3])
+  })
+
+  it('pairs 1 with the last seed in every size', () => {
+    for (const size of BRACKET_SIZES) {
+      const pairs = firstRoundPairs(size)
+      expect(pairs).toHaveLength(size / 2)
+      expect(pairs[0]).toEqual([1, size])
+      for (const [a, b] of pairs) expect(a + b).toBe(size + 1)
+    }
+  })
+
+  it('names rounds on the fixed scale', () => {
+    expect([roundName(0), roundName(4), roundName(6)]).toEqual(['Round of 128', 'Quarter-finals', 'Final'])
   })
 })
 

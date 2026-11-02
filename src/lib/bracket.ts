@@ -1,4 +1,4 @@
-// Bracket structure. Mirrors public.bracket_order() / public.stage_for() in SQL (parity checked in pgTAP).
+// Bracket structure. Mirrors public.bracket_order() / public.first_round() in SQL (parity checked in pgTAP).
 
 /** Standard seeding order: adjacent pairs are first-round matchups ([1, 64, 32, 33, 16, 49, ...] for 64). */
 export function bracketOrder(size: number): number[] {
@@ -16,28 +16,43 @@ export function firstRoundPairs(size = 64): [number, number][] {
   return Array.from({ length: size / 2 }, (_, i) => [order[2 * i], order[2 * i + 1]])
 }
 
+/** Bracket sizes (seeds) Harry can pick per bracket (2026-11-02). */
+export const BRACKET_SIZES = [8, 16, 32, 64, 128] as const
+export const DEFAULT_SIZE = 64
+export const FINAL_ROUND = 6
+
+/**
+ * Rounds are numbered by how many entries are left, on one scale for every size: round r holds 2^(7-r)
+ * entries. So the final is always round 6 (slot 1 is the third-place playoff) and smaller brackets start
+ * later: a 128 bracket starts at round 0, an 8 bracket at round 4 (the quarter-finals).
+ */
 export const ROUNDS = [
-  { round: 1, name: 'Round of 64', matchups: 32 },
-  { round: 2, name: 'Round of 32', matchups: 16 },
-  { round: 3, name: 'Round of 16', matchups: 8 },
-  { round: 4, name: 'Quarter-finals', matchups: 4 },
-  { round: 5, name: 'Semi-finals', matchups: 2 },
-  { round: 6, name: 'Final', matchups: 1 },
+  { round: 0, name: 'Round of 128', short: 'R128' },
+  { round: 1, name: 'Round of 64', short: 'R64' },
+  { round: 2, name: 'Round of 32', short: 'R32' },
+  { round: 3, name: 'Round of 16', short: 'R16' },
+  { round: 4, name: 'Quarter-finals', short: 'QF' },
+  { round: 5, name: 'Semi-finals', short: 'SF' },
+  { round: 6, name: 'Final', short: 'Final' },
 ] as const
 
-/** One stage per round (Harry, 2026-10-23): each round is released in its entirety. */
-export const STAGE_LABELS = [
-  'Round of 64',
-  'Round of 32',
-  'Round of 16',
-  'Quarter-finals',
-  'Semi-finals',
-  'Final + third-place playoff',
-] as const
+const clampRound = (round: number) => Math.min(Math.max(round, 0), FINAL_ROUND)
+export const roundName = (round: number): string => ROUNDS[clampRound(round)].name
+export const roundShort = (round: number): string => ROUNDS[clampRound(round)].short
 
-/** Which stage a matchup belongs to: its round. Round 6 slot 1 is the third-place playoff. */
-export function stageFor(round: number, _slot: number): number {
-  return round
+/** First round a bracket of this size plays. Mirrors public.first_round() in SQL. */
+export function firstRound(size: number): number {
+  return FINAL_ROUND + 1 - Math.log2(size)
+}
+
+/** One stage per round (Harry, 2026-10-23), numbered from 1 in play order. */
+export function stageOf(round: number, size: number): number {
+  return round - firstRound(size) + 1
+}
+
+/** The rounds a bracket of this size plays, first to final. */
+export function roundsFor(size: number) {
+  return ROUNDS.filter((r) => r.round >= firstRound(size))
 }
 
 /** Seed-gap of an upset (winner seed minus loser seed), or 0 if the favourite won. */

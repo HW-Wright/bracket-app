@@ -4,6 +4,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { useBracket } from '../bracket/BracketProvider'
 import { useProgress } from '../bracket/useProgress'
 import { useLatestResults } from '../bracket/useLatestResults'
+import { roundShort } from '../lib/bracket'
 import { useKeyboardAware } from '../lib/useKeyboardAware'
 import Crawl from './Crawl'
 import { LiveDot } from './ui'
@@ -84,7 +85,7 @@ function ResultsCrawl() {
   }, [results])
 
   if (!results) return null
-  const round = ['R64', 'R32', 'R16', 'QF', 'SF', 'FINAL'][results.stage.round - 1]
+  const round = roundShort(results.stage.round).toUpperCase()
   return (
     <Crawl
       label={`${results.stage.label} results`}
