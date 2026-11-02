@@ -13,7 +13,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useState, type FormEvent } from 'react'
 import { rpcMessage } from '../../bracket/BracketProvider'
 import { Button, ErrorText, Led } from '../../components/ui'
-import { listStatus, MAX_NOMINATIONS, moveItem } from '../../lib/normalise'
+import { listStatus, MAX_NOMINATIONS, moveItem, nominationPoints } from '../../lib/normalise'
 import { supabase } from '../../lib/supabase'
 import { revealFocusedField } from '../../lib/useKeyboardAware'
 
@@ -104,10 +104,12 @@ function Row({
 
 export default function NominationEditor({
   bracketId,
+  basePoints,
   initial,
   onSaved,
 }: {
   bracketId: string
+  basePoints: number
   initial: string[]
   onSaved: () => void
 }) {
@@ -123,6 +125,8 @@ export default function NominationEditor({
   const savedComplete = listStatus(saved).complete
   const duplicates = current.repeats
   const dupIndexes = new Set(duplicates.flat())
+  const top = nominationPoints(1, basePoints)
+  const bottom = nominationPoints(MAX_NOMINATIONS, basePoints)
   const full = items.length >= MAX_NOMINATIONS
   const missing = MAX_NOMINATIONS - current.count
 
@@ -178,8 +182,10 @@ export default function NominationEditor({
   return (
     <div className="flex flex-col gap-4">
       <p className="text-base text-muted">
-        Rank exactly {MAX_NOMINATIONS}, favourite first. #1 is worth 15 points, #15 is worth 1. Nobody sees your list
-        until Harry closes nominations. Save a draft any time; only complete lists of {MAX_NOMINATIONS} count.
+        Rank exactly {MAX_NOMINATIONS}, favourite first. #1 is worth {top} points, #{MAX_NOMINATIONS} is worth {bottom}, and
+        everyone's points for the same entry add up
+        {2 * bottom > top ? `, so anything two people nominate beats any single pick` : ''}. Nobody sees your list until Harry
+        closes nominations. Save a draft any time; only complete lists of {MAX_NOMINATIONS} count.
       </p>
 
       <div

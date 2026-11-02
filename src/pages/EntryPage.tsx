@@ -6,6 +6,7 @@ import EntryThumb from '../components/EntryThumb'
 import MatchupCard from '../components/MatchupCard'
 import { Badge, Card, Led } from '../components/ui'
 import { roundName } from '../lib/bracket'
+import { nominationPoints } from '../lib/normalise'
 import { entryPath, isThirdPlace, pickStatus, podium } from '../lib/stats'
 import { supabase } from '../lib/supabase'
 import { VoterReveal } from './bracket/BracketView'
@@ -139,7 +140,7 @@ export default function EntryPage() {
                   <Led className="flex h-12 w-11 shrink-0 items-center justify-center">#{n.rank}</Led>
                   <span className="flex-1 text-lg font-semibold">{n.name}</span>
                   {n.text.trim() !== entry.name && <span className="truncate text-sm text-muted">as “{n.text}”</span>}
-                  <span className="font-led text-amber">{16 - n.rank}</span>
+                  {data && <span className="font-led text-amber">{nominationPoints(n.rank, data.bracket.base_points)}</span>}
                 </li>
               ))}
             </ol>

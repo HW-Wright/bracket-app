@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { entryKey, findOwnDuplicates, listStatus, moveItem, normaliseEntry } from './normalise'
+import { entryKey, findOwnDuplicates, listStatus, moveItem, nominationPoints, normaliseEntry } from './normalise'
 
 describe('normaliseEntry', () => {
   it.each([
@@ -72,5 +72,17 @@ describe('listStatus', () => {
   it('is incomplete with an exact repeat', () => {
     const list = [...fifteen.slice(0, 14), 'film-1']
     expect(listStatus(list)).toMatchObject({ count: 15, repeats: [[0, 14]], complete: false })
+  })
+})
+
+describe('nominationPoints', () => {
+  it('adds the base to 16 − rank (#1 = 30 … #15 = 16 with base 15)', () => {
+    expect([1, 8, 15].map((r) => nominationPoints(r, 15))).toEqual([30, 23, 16])
+  })
+  it('keeps plain 16 − rank for brackets scored before the base (0)', () => {
+    expect([1, 15].map((r) => nominationPoints(r, 0))).toEqual([15, 1])
+  })
+  it('makes any two nominations outrank one with base 15', () => {
+    expect(2 * nominationPoints(15, 15)).toBeGreaterThan(nominationPoints(1, 15))
   })
 })

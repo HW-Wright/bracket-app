@@ -44,6 +44,15 @@ export function moveItem<T>(items: T[], from: number, to: number): T[] {
 
 export const MAX_NOMINATIONS = 15
 
+/**
+ * Points one counted nomination earns: the bracket's base points plus 16 − rank. The base is 15 from 2026-11-03
+ * (#1 = 30 … #15 = 16, so anything two people nominate outranks any single pick) and 0 for earlier brackets.
+ * Mirrors entry_standings().
+ */
+export function nominationPoints(rank: number, basePoints: number): number {
+  return basePoints + 16 - rank
+}
+
 export interface ListStatus {
   count: number
   repeats: number[][]

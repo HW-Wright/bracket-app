@@ -31,7 +31,7 @@ export function useBracketData(bracketId: string | undefined) {
     const [b, st, ms, ts, vs, ps] = await Promise.all([
       supabase
         .from('brackets')
-        .select('id, title, description, phase, size, created_at, nominations_opened_at, nominations_closed_at, locked_at, completed_at')
+        .select('id, title, description, phase, size, base_points, created_at, nominations_opened_at, nominations_closed_at, locked_at, completed_at')
         .eq('id', bracketId)
         .maybeSingle(),
       supabase.from('stages').select('number, round, label, status').eq('bracket_id', bracketId).order('number'),

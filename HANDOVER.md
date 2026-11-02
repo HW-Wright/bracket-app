@@ -10,7 +10,7 @@ This is for a Claude Code session that picks up this codebase without the origin
 - open items;
 - where the code assumes a single group.
 
-Written 2026-11-03 at commit `accd120`. Dates are Harry's local dates (commits show +1100).
+Written 2026-11-03, and updated the same day for the base-points scoring change (migration `20261103000000_base_points.sql`). Dates are Harry's local dates (commits show +1100).
 
 ---
 
@@ -41,6 +41,7 @@ Start the new version from `git clone` (or delete those files), then `supabase l
 - **Brackets played:** one real one, "The Worst Person of all Time" (64 seeds). Nominations opened around 2026-10-24 and it finished by 2026-11-02.
   - At the last check it was complete but not archived. Harry was going to press Admin → Archive now.
   - Brackets created before the sizes migration have size 64.
+  - It was scored under the old rule (base points 0, plain 16 − rank), and it keeps those points.
 - **Stage counts:** no 10-stage bracket is left. The only one, "Test – ignore", was deleted on 2026-10-23. Advance and undo still look up whether a next stage exists rather than assume a count.
 
 ## 3. Working with Harry
@@ -83,6 +84,11 @@ SPEC records *what* was decided and when. These are the reasons, where they aren
   - Fuzzy matches stay suggestions because near-misses are often different things. "Spider-Man" vs "Spider-Man 2" is a regular false positive: answer **Not the same**.
 - **Spaces are dropped in `entry_key`.** With spaces kept, "Spider-Man" normalised to "spider man" and missed "spiderman".
 - **Merges never rewrite data.** Scores are recomputed over the merge tree, so unmerge just clears `merged_into`. The target is the earlier entry and keeps its tiebreak, so a merge can't reroll the order.
+- **Base points per nomination** (2026-11-03). Harry wanted how many people nominated something to matter more than how they ranked it, with both still counting.
+  - Replaying the first bracket showed why: under plain 16 − rank, a pick three people made (Genghis Khan) sat at seed 31, behind single #1 picks. The first single pick was seed 14 and the last shared pick seed 39.
+  - Three options were offered with that replay: nominators first (rank only breaks ties), base 15, and a lighter base of 8. Harry chose base 15.
+  - With base 15, anything two people nominate outranks any single pick. Further up, rankings can outweigh one extra nominator (two #1s, 60, beat three #15s, 48).
+  - The base is stored per bracket, so the finished bracket keeps its points.
 - **Typed-title confirmations are lenient.** The first test bracket's title, "Test – ignore", had an en dash that phone keyboards make hard to type, so Harry couldn't abandon it. Confirmations now ignore case, punctuation and dash style (`20261023100000_lenient_title_confirm.sql`).
 
 ### Bracket and voting
@@ -138,6 +144,8 @@ Don't propose these again without a new reason. The comparison artifact (section
 | Kingmaker stat | dropped | 2026-10-30 |
 | Mystery seeds dealt from the whole bracket | the top half | 2026-10-30 |
 | A second free Supabase project for tests | the local Docker stack | 2026-10-23 |
+| Points of plain 16 − rank (a single #1 beat two people's lower picks) | base 15 + (16 − rank) per nomination | 2026-11-03 |
+| Nominators-first ordering, or a lighter base of 8 | offered alongside base 15; not chosen | 2026-11-03 |
 
 ## 6. Quirks and workarounds
 
@@ -243,6 +251,7 @@ The account's password and sessions were kept.
 - **`users.local.json` may still say `connor`.** If it does, re-running `npm run seed:users` would create a second account called "connor". It hasn't been checked, because the file stays unopened.
   - Fix with: `sed -i '' 's/"username": "connor", "displayName": "Connor"/"username": "conor", "displayName": "Conor"/' users.local.json`
 - **The finished live bracket** may still be waiting for Archive now.
+- **"Missed the cut" during review.** While a bracket is in review, the entry page labels every entry "Missed the cut". Seeds are only assigned at lock, and `pickStatus()` treats an entry with no seed as cut. This was already the case before the scoring change; it's not fixed.
 - **No UI tests.** Vitest covers pure logic only, and the database and integration scripts need the local stack.
   - CI (`deploy.yml`) runs `npm test` and the build, which type-checks. It doesn't run lint or any local-stack test.
 - **Small leftovers in the code** (none of them affect behaviour):
@@ -262,16 +271,17 @@ These are the places that assume one group of friends with one admin:
 - **Copy:** UI text names Harry in about a dozen places (`grep -rn Harry src`). The app name and The Sean Zone are also specific to this group.
 - **Constants:**
   - 15 nominations (`MAX_NOMINATIONS` in TS, `nomination_list_status()` in SQL);
-  - points of 16 − rank;
+  - points per nomination of `base_points` + 16 − rank (base 15 for new brackets; `nominationPoints()` in TS);
   - sizes 8 to 128.
 - **Layout:** Taste twins draws an N×N grid sized for about eight players at 360px.
 - **Per-bracket keys:** storage paths are `entry-images/<bracket id>/`, and Realtime channels are per bracket.
 
 ## 10. Verification at handover
 
-- The commit that adds this file changes only docs. `npm test` (59 tests), `npm run typecheck`, `npm run lint` and `npm run build` pass.
-- The local-stack checks last ran on 2026-11-02 against `accd120`, and the code hasn't changed since. All of these passed:
-  - the 10 pgTAP files;
-  - dry runs at 8, 64 and 128 seeds;
-  - `test:queries`, `test:realtime` and `test:storage`.
+- On 2026-11-03, with the base-points change, all of these passed:
+  - `npm test` (62 tests), `npm run typecheck`, `npm run lint` and `npm run build`;
+  - all 11 pgTAP files (226 tests), including the new `scoring.test.sql`;
+  - a full 64-seed dry run and `test:queries`;
+  - 360px screenshots of the Nominate page, the review Seeding and Nominations tabs and an entry page, against the local stack.
+- `test:realtime` and `test:storage` last passed on 2026-11-02, and dry runs at 8 and 128 seeds on 2026-11-02. The scoring change doesn't touch any of them.
 - `test:auth` last ran on 2026-10-23. `admin-users` hasn't changed since.

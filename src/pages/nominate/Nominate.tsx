@@ -114,6 +114,7 @@ export default function Nominate() {
           <NominationEditor
             key={bracket.id}
             bracketId={bracket.id}
+            basePoints={bracket.base_points}
             initial={mine.map((r) => r.text)}
             onSaved={reload}
           />

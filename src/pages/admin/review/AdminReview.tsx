@@ -5,6 +5,7 @@ import { useBracket } from '../../../bracket/BracketProvider'
 import EntryThumb from '../../../components/EntryThumb'
 import { Badge, Button, Card, ErrorText, Led, PageTitle } from '../../../components/ui'
 import { firstRound, roundName } from '../../../lib/bracket'
+import { MAX_NOMINATIONS, nominationPoints } from '../../../lib/normalise'
 import EntriesTab from './EntriesTab'
 import MergeDialog from './MergeDialog'
 import { rootOf, useReview, type ReviewData, type Standing, type Suggestion } from './useReview'
@@ -25,7 +26,21 @@ function SeedRow({ s, size }: { s: Standing; size: number }) {
   )
 }
 
-function SeedingTab({ data, size, locked, onLock, busy }: { data: ReviewData; size: number; locked: boolean; onLock: () => void; busy: boolean }) {
+function SeedingTab({
+  data,
+  size,
+  basePoints,
+  locked,
+  onLock,
+  busy,
+}: {
+  data: ReviewData
+  size: number
+  basePoints: number
+  locked: boolean
+  onLock: () => void
+  busy: boolean
+}) {
   const live = data.standings.filter((s) => !s.removed)
   const seeded = live.slice(0, size)
   const cut = live.slice(size)
@@ -51,7 +66,10 @@ function SeedingTab({ data, size, locked, onLock, busy }: { data: ReviewData; si
           {shortfall} short of {size}. Add entries manually on the Entries tab (they score 0) before you can lock.
         </p>
       )}
-      <p className="text-base text-muted">Order: points, then number of nominators, then a fixed random tiebreak.</p>
+      <p className="text-base text-muted">
+        Each counted nomination scores {nominationPoints(1, basePoints)} for a #1 down to {nominationPoints(MAX_NOMINATIONS, basePoints)} for a
+        #{MAX_NOMINATIONS}. Order: points, then number of nominators, then a fixed random tiebreak.
+      </p>
 
       <Card title={locked ? 'Locked seeds' : `Seeds 1–${size}`}>
         <ol className="-m-4">
@@ -138,7 +156,7 @@ function SuggestionsTab({ data, act }: { data: ReviewData; act: Act }) {
 
 type SortKey = 'nominator' | 'rank' | 'text' | 'entry'
 
-function NominationsTab({ data }: { data: ReviewData }) {
+function NominationsTab({ data, basePoints }: { data: ReviewData; basePoints: number }) {
   const [sort, setSort] = useState<SortKey>('nominator')
   const [who, setWho] = useState('all')
   const [query, setQuery] = useState('')
@@ -195,7 +213,7 @@ function NominationsTab({ data }: { data: ReviewData }) {
                 {n.entry ? (n.entry === n.text.trim() ? 'own entry' : `→ ${n.entry}`) : <span className="text-danger">not counted (incomplete list)</span>}
               </span>
             </span>
-            <span className="shrink-0 font-led text-amber">{n.entry ? 16 - n.rank : 0}</span>
+            <span className="shrink-0 font-led text-amber">{n.entry ? nominationPoints(n.rank, basePoints) : 0}</span>
           </li>
         ))}
       </ol>
@@ -284,13 +302,13 @@ export default function AdminReview() {
       {!data ? (
         <p className="text-base text-muted">Loading…</p>
       ) : tab === 'Seeding' ? (
-        <SeedingTab data={data} size={bracket.size} locked={locked} onLock={lock} busy={busy} />
+        <SeedingTab data={data} size={bracket.size} basePoints={bracket.base_points} locked={locked} onLock={lock} busy={busy} />
       ) : tab === 'Entries' ? (
         <EntriesTab bracketId={bracket.id} data={data} locked={locked} act={review.act} reload={review.reload} />
       ) : tab === 'Suggestions' ? (
         <SuggestionsTab data={data} act={review.act} />
       ) : tab === 'Nominations' ? (
-        <NominationsTab data={data} />
+        <NominationsTab data={data} basePoints={bracket.base_points} />
       ) : (
         <RemovedTab data={data} act={review.act} locked={locked} />
       )}

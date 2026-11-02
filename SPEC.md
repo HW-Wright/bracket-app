@@ -98,7 +98,7 @@ This is the most important admin screen. **Nothing is ever dropped or merged wit
 - Entries without an image get a styled placeholder (LED panel with initials).
 
 ### 5.5 Scoring and seeding
-- **Points:** each nomination is worth `16 - rank` (rank 1 = 15 points, rank 15 = 1 point). An entry's score is the sum across nominators.
+- **Points:** each counted nomination is worth a **base of 15 plus `16 - rank`**: rank 1 = 30 points, rank 15 = 16 (Harry, 2026-11-03: how many people nominated an entry should count for more than how they ranked it, with both still counting). An entry's score is the sum across nominators, so anything two people nominate (32 or more) outranks any single pick (30 at most), while rankings still order everything. The base is stored per bracket (`brackets.base_points`); brackets created before this have base 0 (plain `16 - rank`) and keep their points.
 - **Order:** points descending, then number of distinct nominators descending, then a **random tiebreak value**.
 - The random tiebreak value is generated **once** per entry when it is created and stored, so the preview is stable and cannot be rerolled. When entries are merged, the merged entry keeps the value of the earlier-created entry (the merge target).
 - **Seeding preview:** show seeds 1 to the bracket size with points and nominator count, and a clear **cut line**. Everything below it is listed as "Cut" with its points. Harry sees exactly what will be cut before locking.

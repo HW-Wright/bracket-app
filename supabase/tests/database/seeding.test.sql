@@ -10,7 +10,8 @@ insert into public.profiles (id, username, display_name, is_admin) values
   ('00000000-0000-0000-0000-0000000000a1', 'harry', 'Harry', true),
   ('00000000-0000-0000-0000-0000000000b2', 'joe', 'Joe', false),
   ('00000000-0000-0000-0000-0000000000c3', 'sean', 'Sean', false);
-insert into public.brackets (id, title, phase) values ('00000000-0000-0000-0000-00000000bb01', 'Films', 'nominations');
+-- base_points 0: plain 16 - rank, as brackets were scored before 2026-11-03 (scoring.test.sql covers the base).
+insert into public.brackets (id, title, phase, base_points) values ('00000000-0000-0000-0000-00000000bb01', 'Films', 'nominations', 0);
 
 create function pg_temp.as_user(p_id text) returns void language sql as $$
   select set_config('role', 'authenticated', true),

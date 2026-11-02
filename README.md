@@ -85,7 +85,7 @@ Everything is in the **Admin** tab (★). Only you see it.
 
 ### Start a bracket
 1. Admin → **Start a new bracket**: title (the topic), optional description and **size** (8, 16, 32, 64 or 128 seeds; 64 by default). It's created as a **draft**; nobody can nominate yet. You can change the size (Edit) until you lock seeding.
-2. **Open nominations.** Everyone ranks exactly 15, #1 = 15 points to #15 = 1. Lists stay private (to you too) until you close.
+2. **Open nominations.** Everyone ranks exactly 15: #1 = 30 points down to #15 = 16, and points for the same entry add up, so anything two people nominate outranks any single pick. Lists stay private from the others until you close; you can see them all under Admin → View everyone's nominations.
 3. Watch Admin's status list (who's at 15/15, who's on a draft, who has a repeat). Nudge people.
 
 ### Close nominations
